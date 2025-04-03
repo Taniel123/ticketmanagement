@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -21,6 +19,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',  // Added role column
     ];
 
     /**
@@ -34,7 +33,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -45,4 +44,44 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Define the constant roles for users.
+     */
+    const ROLE_ADMIN = 'admin';
+    const ROLE_USER = 'user';
+    const ROLE_SUPPORT = 'support';
+
+    /**
+     * Get the role of the user.
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * Check if the user is an admin.
+     */
+    public function isAdmin()
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /**
+     * Check if the user is a support staff.
+     */
+    public function isSupport()
+    {
+        return $this->role === self::ROLE_SUPPORT;
+    }
+
+    /**
+     * Check if the user is a regular user.
+     */
+    public function isUser()
+    {
+        return $this->role === self::ROLE_USER;
+    }
 }
+

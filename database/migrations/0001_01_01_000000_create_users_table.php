@@ -11,23 +11,28 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Create 'users' table
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->enum('role', ['admin', 'support', 'user'])->default('user'); // Role column with default 'user'
+            $table->boolean('is_approved')->default(false); // Approval flag, default is false (pending approval)
             $table->timestamps();
         });
 
+        // Create 'password_reset_tokens' table
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
+        // Create 'sessions' table
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete(); // Foreign key to users table
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
@@ -40,8 +45,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
+        // Drop all tables if rolling back
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
