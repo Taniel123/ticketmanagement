@@ -23,6 +23,8 @@ Route::post('/admin/approve/{id}', [AuthController::class, 'approveUser'])->name
 Route::delete('/admin/delete/{id}', [AuthController::class, 'deleteUser'])->name('admin.delete');
 Route::post('/admin/change-role/{id}', [AuthController::class, 'changeUserRole'])->name('admin.changeRole');
 Route::get('/dashboard/support', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
+Route::patch('/tickets/{id}/status', [TicketController::class, 'updateStatus'])->name('tickets.updateStatus');
+
 
 Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');  // Ticket creation page
 Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');  // Store ticket

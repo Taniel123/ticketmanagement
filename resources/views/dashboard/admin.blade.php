@@ -71,5 +71,32 @@
                 @endforeach
             </tbody>
         </table>
+
+        <h3>All Tickets</h3>
+        <ul>
+            @forelse($tickets as $ticket)
+                <li>
+                    <strong>{{ $ticket->title }}</strong><br>
+                    <em>{{ $ticket->description }}</em><br>
+                    <span>Priority: {{ ucfirst($ticket->priority) }}</span><br>
+                    <span>Status: {{ ucfirst($ticket->status) }}</span><br>
+                    <span>Submitted by: {{ $ticket->user->name ?? 'Unknown' }}</span><br>
+
+                    <!-- Update Status Form -->
+                    <form action="{{ route('tickets.updateStatus', $ticket->id) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <select name="status">
+                            <option value="open" {{ $ticket->status == 'open' ? 'selected' : '' }}>Open</option>
+                            <option value="ongoing" {{ $ticket->status == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                            <option value="closed" {{ $ticket->status == 'closed' ? 'selected' : '' }}>Closed</option>
+                        </select>
+                        <button type="submit">Update Status</button>
+                    </form>
+                </li>
+            @empty
+                <li>No tickets found.</li>
+            @endforelse
+        </ul>
     </div>
 @endsection
