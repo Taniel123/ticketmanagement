@@ -1,17 +1,30 @@
-<!-- resources/views/dashboard/support.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
-    <div class="support-dashboard">
-        <h2>Support Dashboard</h2>
-        <p>Welcome, {{ auth()->user()->name }}! You have support privileges.</p>
-        
-        <div class="support-functions">
-            <ul>
-                <li><a href="#">View Support Tickets</a></li>
-                <li><a href="#">Manage Users' Requests</a></li>
-            </ul>
-        </div>
-    </div>
+    <h1>Support Dashboard</h1>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($tickets as $ticket)
+                <tr>
+                    <td>{{ $ticket->id }}</td>
+                    <td>{{ $ticket->title }}</td>
+                    <td>{{ $ticket->description }}</td>
+                    <td>{{ $ticket->status }}</td>
+                    <td>{{ $ticket->priority }}</td>
+                    <td>{{ $ticket->user->name }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 @endsection

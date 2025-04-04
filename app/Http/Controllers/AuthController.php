@@ -105,8 +105,10 @@ class AuthController extends Controller
         ->where('id', '!=', $user->id) // Exclude the current admin user
         ->get();
 
+        $tickets = Ticket::all();
+
         // Pass the list of pending users to the view
-        return view('dashboard.admin', compact('user', 'pendingUsers', 'users'));
+        return view('dashboard.admin', compact('user', 'pendingUsers', 'users', 'tickets'));
     }
 
     // Show support dashboard
@@ -117,7 +119,10 @@ class AuthController extends Controller
         }
     
         $user = auth()->user(); // Safe to access user now
-        return view('dashboard.support', compact('user'));
+
+        $tickets = Ticket::all();
+
+        return view('dashboard.support', compact('user', 'tickets'));
     }
 
     // Approve User
