@@ -16,9 +16,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'support', 'user'])->default('user'); // Role column with default 'user'
             $table->boolean('is_approved')->default(false); // Approval flag, default is false (pending approval)
+            $table->rememberToken();
             $table->timestamps();
         });
 
