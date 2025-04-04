@@ -17,12 +17,19 @@ Route::post('/register', [AuthController::class, 'register']);  // Handles POST 
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');  // Handles logout
 
-Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])->name('user.dashboard');
-Route::get('/dashboard/admin', [AuthController::class, 'showAdminDashboard'])->name('admin.dashboard');
+Route::middleware(['auth'])->group(function () {
+    // Your protected routes
+    Route::get('/user/dashboard', [AuthController::class, 'showUserDashboard'])->name('user.dashboard');
+    Route::get('/admin/dashboard', [AuthController::class, 'showAdminDashboard'])->name('admin.dashboard');
+    Route::get('/support/dashboard', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
+});
+
+// Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])->name('user.dashboard');
+// Route::get('/dashboard/admin', [AuthController::class, 'showAdminDashboard'])->name('admin.dashboard');
 Route::post('/admin/approve/{id}', [AuthController::class, 'approveUser'])->name('admin.approve');
 Route::delete('/admin/delete/{id}', [AuthController::class, 'deleteUser'])->name('admin.delete');
 Route::post('/admin/change-role/{id}', [AuthController::class, 'changeUserRole'])->name('admin.changeRole');
-Route::get('/dashboard/support', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
+// Route::get('/dashboard/support', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
 Route::patch('/tickets/{id}/status', [TicketController::class, 'updateStatus'])->name('tickets.updateStatus');
 
 
