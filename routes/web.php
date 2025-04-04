@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TicketController;  // Import TicketController
 
 // Make the login page the landing page (so when users visit '/', it will show the login page)
 Route::get('/', function () {
@@ -20,4 +21,8 @@ Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])->nam
 Route::get('/dashboard/admin', [AuthController::class, 'showAdminDashboard'])->name('admin.dashboard');
 Route::post('/admin/approve/{id}', [AuthController::class, 'approveUser'])->name('admin.approve');
 Route::delete('/admin/delete/{id}', [AuthController::class, 'deleteUser'])->name('admin.delete');
+Route::post('/admin/change-role/{id}', [AuthController::class, 'changeUserRole'])->name('admin.changeRole');
 Route::get('/dashboard/support', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
+
+Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');  // Ticket creation page
+Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');  // Store ticket

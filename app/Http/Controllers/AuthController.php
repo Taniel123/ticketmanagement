@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -83,7 +84,10 @@ class AuthController extends Controller
         }
     
         $user = auth()->user(); // Safe to access user now
-        return view('dashboard.user', compact('user'));
+
+        $tickets = Ticket::where('user_id', $user->id)->get();
+
+        return view('dashboard.user', compact('user', 'tickets'));
     }
 
     // Show admin dashboard
@@ -97,8 +101,12 @@ class AuthController extends Controller
 
         $pendingUsers = User::where('is_approved', false)->get();
 
+        $users = User::where('is_approved', true)
+        ->where('id', '!=', $user->id) // Exclude the current admin user
+        ->get();
+
         // Pass the list of pending users to the view
-        return view('dashboard.admin', compact('user', 'pendingUsers'));
+        return view('dashboard.admin', compact('user', 'pendingUsers', 'users'));
     }
 
     // Show support dashboard
@@ -138,5 +146,28 @@ public function deleteUser($id)
     // Redirect back to admin dashboard with success message
     return redirect()->route('admin.dashboard')->with('success', 'User deleted successfully.');
 }
+
+public function changeUserRole(Request $request, $id)
+{
+    // Validate the incoming role change request
+    $request->validate([
+        'role' => 'required|in:user,support,admin', // Only allow these roles
+    ]);
+
+    // Find the user by ID
+    $user = User::findOrFail($id);
+
+    // Prevent changing the admin's role
+    if (auth()->user()->id === $user->id) {
+        return redirect()->route('admin.dashboard')->withErrors('You cannot change your own role.');
+    }
+
+    // Update the user's role
+    $user->role = $request->role;
+    $user->save();
+
+    return redirect()->route('admin.dashboard')->with('success', 'User role updated successfully.');
+}
+
 
 }

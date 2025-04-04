@@ -38,5 +38,38 @@
                 @endforeach
             </tbody>
         </table>
+
+        <h3>Change User Roles</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                    <tr>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ ucfirst($user->role) }}</td>
+                        <td>
+                            <!-- Role Change Form -->
+                            <form action="{{ route('admin.changeRole', $user->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <select name="role" required>
+                                    <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
+                                    <option value="support" {{ $user->role == 'support' ? 'selected' : '' }}>Support</option>
+                                    <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                                </select>
+                                <button type="submit">Change Role</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 @endsection

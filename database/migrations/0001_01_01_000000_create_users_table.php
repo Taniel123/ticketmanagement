@@ -38,6 +38,17 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('tickets', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('description');
+            $table->enum('priority', ['Low', 'Medium', 'High'])->default('Medium');
+            $table->enum('status', ['Open', 'Ongoing', 'Closed'])->default('Open');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Link ticket to user (creator)
+            $table->string('created_by'); // Store the name of the user who created the ticket
+            $table->timestamps();
+        });
     }
 
     /**
@@ -46,6 +57,7 @@ return new class extends Migration
     public function down(): void
     {
         // Drop all tables if rolling back
+        Schema::dropIfExists('tickets');
         Schema::dropIfExists('sessions');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
