@@ -2,30 +2,32 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',  // Added role column
+        'role',
+        'is_approved'
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -35,53 +37,73 @@ class User extends Authenticatable
     /**
      * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_approved' => 'boolean',
+    ];
+
+    /**
+     * Get the valid roles.
+     *
+     * @return array
+     */
+    public static function getRoles(): array
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return ['admin', 'support', 'user'];
     }
 
     /**
-     * Define the constant roles for users.
+     * Check if user has a specific role
      */
-    const ROLE_ADMIN = 'admin';
-    const ROLE_USER = 'user';
-    const ROLE_SUPPORT = 'support';
-
-    /**
-     * Get the role of the user.
-     */
-    public function getRole()
+    public function hasRole(string|array $roles): bool
     {
-        return $this->role;
+        if (is_string($roles)) {
+            return $this->role === $roles;
+        }
+
+        return in_array($this->role, $roles);
     }
 
     /**
-     * Check if the user is an admin.
+     * Get the tickets created by the user.
      */
-    public function isAdmin()
+    public function tickets()
     {
-        return $this->role === self::ROLE_ADMIN;
-    }
-
-    /**
-     * Check if the user is a support staff.
-     */
-    public function isSupport()
-    {
-        return $this->role === self::ROLE_SUPPORT;
-    }
-
-    /**
-     * Check if the user is a regular user.
-     */
-    public function isUser()
-    {
-        return $this->role === self::ROLE_USER;
+        return $this->hasMany(Ticket::class);
     }
 }
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddRoleToUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('role')->default('user');
+            $table->boolean('is_approved')->default(false);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
+            $table->dropColumn('is_approved');
+        });
+    }
+}

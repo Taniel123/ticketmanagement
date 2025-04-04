@@ -14,11 +14,12 @@ class Ticket extends Model
         'description',
         'priority',
         'status',
-        'created_by',
-        'user_id',  // Add user_id to fillable array
+        'user_id'
     ];
 
-    // Define the relationship between tickets and users
+    /**
+     * Get the user that created the ticket.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
