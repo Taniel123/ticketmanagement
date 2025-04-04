@@ -38,7 +38,7 @@
     <div class="relative pt-16 pb-20 flex flex-col items-center">
         <div class="text-center max-w-2xl px-6 mt-16">
             <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight">
-                Ticket Management<br><span class="text-green-400">Simplified</span>
+                Ticket Management<br><span class="text-green-400">System</span>
             </h1>
             <p class="mt-6 text-xl text-gray-300">
                 Track, manage, and resolve customer issues with ease.
@@ -126,17 +126,7 @@
     <footer class="bg-black/40 border-t border-white/10">
         <div class="max-w-7xl mx-auto py-8 px-6 flex justify-between items-center">
             <p class="text-base text-gray-400">&copy; 2025 TMS</p>
-            <div class="flex space-x-6">
-                <a href="#" class="text-gray-400 hover:text-gray-300">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="text-gray-400 hover:text-gray-300">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="text-gray-400 hover:text-gray-300">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-            </div>
+         
         </div>
     </footer>
 </body>
