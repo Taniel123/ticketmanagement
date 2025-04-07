@@ -14,8 +14,14 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        if (!$request->user()->hasRole($roles)) {
-            abort(403, 'Unauthorized action.');
+        // Get the user's current role
+        $userRole = $request->user()->role;
+
+        // Check if user's role matches any of the allowed roles
+        if (!in_array($userRole, $roles)) {
+            // If user is logged in but unauthorized, redirect to their proper dashboard
+            return redirect()->route($userRole . '.dashboard')
+                ->with('error', 'You are not authorized to access that page.');
         }
 
         return $next($request);

@@ -35,24 +35,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Common routes for all authenticated users
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // User dashboard route - accessible by all authenticated users
+    // User dashboard route - accessible by users only
     Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])
-        ->name('user.dashboard');
+        ->name('user.dashboard')
+        ->middleware('role:user');
 
     // User ticket routes
     Route::resource('tickets', TicketController::class)
         ->except(['edit', 'destroy']);
 
-    // Support routes with prefix
-    Route::group(['prefix' => 'support', 'middleware' => ['auth', 'verified', 'role:support,admin']], function () {
+    // Support routes
+    Route::prefix('support')->middleware('role:support')->group(function () {
         Route::get('/dashboard', [AuthController::class, 'showSupportDashboard'])
             ->name('support.dashboard');
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
             ->name('tickets.update-status');
     });
 
-    // Admin routes with prefix
-    Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', 'role:admin']], function () {
+    // Admin routes
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AuthController::class, 'showAdminDashboard'])
             ->name('admin.dashboard');
         Route::get('/', [AdminController::class, 'index'])

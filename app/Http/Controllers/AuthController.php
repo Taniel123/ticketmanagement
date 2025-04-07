@@ -88,24 +88,34 @@ class AuthController extends Controller
     // Show user dashboard
     public function showUserDashboard()
     {
+        if (auth()->user()->role !== 'user') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $user = Auth::user();
         $tickets = $user->tickets()->latest()->get();
-        
         return view('dashboard.user', compact('tickets'));
     }
 
     // Show admin dashboard
     public function showAdminDashboard()
     {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $pendingUsers = User::where('is_approved', false)->get();
         $users = User::where('is_approved', true)->get();
-        
         return view('dashboard.admin', compact('pendingUsers', 'users'));
     }
 
     // Show support dashboard
     public function showSupportDashboard()
     {
+        if (auth()->user()->role !== 'support') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->get();
         return view('dashboard.support', compact('tickets'));
     }
