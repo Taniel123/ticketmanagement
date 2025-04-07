@@ -1,74 +1,78 @@
-@extends('layouts.auth')
+@extends('layouts.app') <!-- Extending the app.blade.php layout -->
 
 @section('content')
-<div class="flex flex-col md:flex-row w-screen h-screen overflow-hidden">
-
-    <!-- Left Side (Branding) -->
-    <div class="flex-1 flex flex-col justify-center bg-gradient-to-br from-indigo-900 to-purple-700 text-white p-10">
-        <p class="ml-0 mt-2 text-6xl md:text-7xl lg:text-8xl font-bold text-white text-left">Create<br>Account</p>
-
-        <div class="mt-12 bg-white/10 backdrop-blur p-6 rounded-xl">
-            <h3 class="text-2xl font-semibold mb-4">Join the Ticket System</h3>
-            <div class="space-y-4">
-                <p class="text-gray-200">Submit tickets, get support, and manage issues efficiently.</p>
-                <p class="text-gray-200">Choose your role upon login to access tailored features.</p>
-            </div>
+<div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-6 bg-white p-8 rounded-xl shadow-lg">
+        <div class="text-center">
+            <h2 class="mt-2 text-3xl font-extrabold text-gray-900">Create your account</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Join us today and get started
+            </p>
         </div>
-    </div>
-
-    <!-- Right Side (Register Form) -->
-    <div class="flex-1 flex items-center justify-center bg-gray-50 px-6 md:px-16 py-10 relative">
-        <div class="w-full max-w-md bg-white p-8 md:p-10 shadow-xl rounded-lg z-10 border border-gray-100">
-            <h2 class="text-2xl md:text-3xl font-semibold text-indigo-800 text-center">{{ __('Register') }}</h2>
-            <p class="text-center text-gray-600 mt-2">Sign up to get started.</p>
-
-            <form method="POST" action="{{ route('register') }}" class="mt-6">
-                @csrf
-
-                <div class="mb-4">
+        
+        <form class="mt-6 space-y-6" action="{{ route('register') }}" method="POST">
+            @csrf
+            
+            <div class="space-y-5">
+                <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
-                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <input id="name" name="name" type="text" required 
+                        class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
+                        placeholder="Enter your name">
                     @error('name')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required 
+                        class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
+                        placeholder="Enter your email">
                     @error('email')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div class="mb-4">
+                
+                <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input id="password" type="password" name="password" required
-                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <input id="password" name="password" type="password" autocomplete="new-password" required 
+                        class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
+                        placeholder="Enter your password">
                     @error('password')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div class="mb-4">
+                
+                <div>
                     <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required
-                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required 
+                        class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-colors"
+                        placeholder="Confirm your password">
                 </div>
+            </div>
 
-                <div class="mt-6">
-                    <button type="submit"
-                        class="w-full px-4 py-3 text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150">
-                        {{ __('Register') }}
-                    </button>
-                </div>
-
-                <div class="mt-6 text-center">
-                    <p>May account ka na? <a href="{{ route('login') }}" class="text-indigo-600 hover:underline">Login here</a></p>
-                </div>
-            </form>
+            <div class="pt-2">
+                <button type="submit" 
+                    class="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <!-- Heroicon name: solid/lock-closed -->
+                        <svg class="h-5 w-5 text-emerald-500 group-hover:text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    Register
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-4">
+            <p class="text-sm text-gray-600">
+                Already have an account? 
+                <a href="{{ route('login') }}" class="font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
+                    Login here
+                </a>
+            </p>
         </div>
     </div>
 </div>

@@ -13,11 +13,12 @@ Route::get('/', function () {
 })->name('home');
 
 // Authentication routes
-// Authentication routes - remove guest middleware
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+
 
 // Email verification routes
 Route::middleware('auth')->group(function () {
@@ -40,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // User ticket routes
     Route::resource('tickets', TicketController::class)
-        ->except(['edit', 'update', 'destroy']);
+        ->except(['edit', 'destroy']);
 
     // Support routes with prefix
     Route::group(['prefix' => 'support', 'middleware' => ['auth', 'verified', 'role:support,admin']], function () {

@@ -13,9 +13,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
+            $table->enum('status', ['open', 'ongoing', 'closed'])->default('open'); // Changed in_progress to ongoing
             $table->enum('priority', ['low', 'medium', 'high'])->default('low');
+            $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
+
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
         });
     }
 
