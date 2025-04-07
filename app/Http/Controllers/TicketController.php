@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\TicketNotification;
 
 class TicketController extends Controller
 {
@@ -51,6 +52,15 @@ class TicketController extends Controller
             'created_by' => Auth::id()
         ]);
 
+        // Notify user
+        $ticket->user->notify(new TicketNotification($ticket, 'created', auth()->user()));
+
+        // Notify support team
+        $supportUsers = User::where('role', 'support')->get();
+        foreach ($supportUsers as $supportUser) {
+            $supportUser->notify(new TicketNotification($ticket, 'new_ticket_for_support', auth()->user()));
+        }
+
         return redirect()->route('user.dashboard')
             ->with('success', 'Ticket created successfully.');
     }
@@ -82,7 +92,15 @@ class TicketController extends Controller
         $ticket->status = $request->status;
         $ticket->save();
 
-        // Send notification if status changed to closed
+        // Notify ticket owner
+        $ticket->user->notify(new TicketNotification(
+            $ticket, 
+            'status_updated', 
+            auth()->user(),
+            $oldStatus
+        ));
+
+        // If closed, send additional notification
         if ($request->status === 'closed' && $oldStatus !== 'closed') {
             $ticket->user->notify(new TicketNotification($ticket, 'closed', auth()->user()));
         }

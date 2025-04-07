@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use App\Notifications\TicketNotification;
 
 class AuthController extends Controller
 {
@@ -115,6 +116,9 @@ class AuthController extends Controller
         $user = User::findOrFail($id);
         $user->update(['is_approved' => true]);
         
+        // Send notification to user
+        $user->notify(new TicketNotification(null, 'user_approved', auth()->user()));
+        
         return back()->with('success', 'User approved successfully.');
     }
 
@@ -134,7 +138,11 @@ class AuthController extends Controller
     public function changeUserRole(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $oldRole = $user->role;
         $user->update(['role' => $request->role]);
+        
+        // Send notification to user
+        $user->notify(new TicketNotification(null, 'user_role_changed', auth()->user()));
         
         return back()->with('success', 'User role updated successfully.');
     }
