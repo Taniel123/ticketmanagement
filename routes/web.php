@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // User ticket routes
     Route::resource('tickets', TicketController::class)
-        ->except(['edit', 'update', 'destroy']);
+        ->except(['edit', 'destroy']);
 
     // Support routes with prefix
     Route::group(['prefix' => 'support', 'middleware' => ['auth', 'verified', 'role:support,admin']], function () {

@@ -35,8 +35,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             {{ $ticket->status == 'open' ? 'bg-green-100 text-green-800' : 
-                                               ($ticket->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
-                                            {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                                               ($ticket->status == 'ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                            {{ ucfirst($ticket->status) }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -50,13 +50,13 @@
                                         {{ $ticket->user->name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <form action="{{ route('tickets.update', $ticket->id) }}" method="POST" class="flex items-center space-x-2">
+                                        <form action="{{ route('tickets.update-status', $ticket) }}" method="POST" class="flex items-center space-x-2">
                                             @csrf
                                             @method('PATCH')
                                             <select name="status" class="block bg-gray-50 border border-gray-300 text-gray-700 py-1 px-3 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-sm">
-                                                <option value="open" {{ $ticket->status == 'open' ? 'selected' : '' }}>Open</option>
-                                                <option value="in_progress" {{ $ticket->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                                <option value="closed" {{ $ticket->status == 'closed' ? 'selected' : '' }}>Closed</option>
+                                                <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Open</option>
+                                                <option value="ongoing" {{ $ticket->status === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                                                <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }}>Closed</option>
                                             </select>
                                             <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-3 rounded text-xs font-medium transition-colors">
                                                 Update

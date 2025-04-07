@@ -105,7 +105,7 @@ class AuthController extends Controller
     // Show support dashboard
     public function showSupportDashboard()
     {
-        $tickets = Ticket::whereIn('status', ['open', 'in_progress'])->latest()->get();
+        $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->get();
         return view('dashboard.support', compact('tickets'));
     }
 
