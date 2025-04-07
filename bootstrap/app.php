@@ -15,7 +15,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => CheckRole::class
         ]);
+
+        // Configure CSRF token validation
+        $middleware->validateCsrfTokens(except: [
+            'api/*',                    // Exclude API routes if you have any
+            'webhooks/*',               // Exclude webhook endpoints if you have any
+            'tickets/*/status',         // Exclude ticket status updates
+            'admin/approve/*',          // Exclude admin approval endpoints
+            'admin/change-role/*',      // Exclude role change endpoints
+            'admin/delete/*'            // Exclude user deletion endpoints
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+
+
