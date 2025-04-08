@@ -77,7 +77,6 @@
             <!-- Main Content -->
             <main class="flex-1 overflow-auto focus:outline-none bg-white">
                 <div class="py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 class="text-2xl font-semibold">Dashboard</h1>
                     @yield('content')
                 </div>
             </main>
