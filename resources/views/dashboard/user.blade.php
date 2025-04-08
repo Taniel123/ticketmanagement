@@ -3,63 +3,127 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-12 bg-gray-50 min-h-screen">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <!-- Header Section -->
-        <div class="mb-10">
-            <h1 class="text-3xl font-bold text-gray-900">User Dashboard</h1>
-            <p class="mt-1 text-sm text-gray-500">View and manage your support tickets</p>
+<div class="py-6">
+    <!-- Header Section -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+                <div class="h-8 w-2 bg-indigo-600 rounded-full mr-3"></div>
+                User Dashboard
+            </h1>
+            <p class="text-sm text-gray-500 mt-1 ml-5">View and manage your support tickets</p>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-800">Quick Actions</h2>
-                        <p class="mt-1 text-sm text-gray-500">Create and manage your tickets</p>
-                    </div>
-                    <a href="{{ route('tickets.create') }}" 
-                        class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded text-sm font-medium transition-colors">
-                        Create New Ticket
-                    </a>
+        
+        <!-- Quick Stats -->
+        <div class="mt-4 md:mt-0 flex space-x-3">
+            <div class="bg-indigo-100 rounded-lg px-4 py-2 flex items-center">
+                <div class="p-2 bg-indigo-600 rounded-md mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xs text-indigo-700 font-medium">Your Tickets</span>
+                    <p class="text-lg font-semibold text-indigo-800">{{ $tickets->count() }}</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Tickets List -->
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Tickets</h2>
-                
-                @if($tickets->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($tickets as $ticket)
-                            <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 hover:shadow-md transition-all duration-300">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-medium text-gray-800 flex items-center">
+                <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
+                Quick Actions
+            </h2>
+        </div>
+        <div class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Create and manage your support tickets</p>
+            </div>
+            <a href="{{ route('tickets.create') }}" 
+                class="mt-4 sm:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Create New Ticket
+            </a>
+        </div>
+    </div>
+
+    <!-- Tickets List -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-800 flex items-center">
+                <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
+                Your Tickets
+            </h2>
+            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center">
+                <span class="h-1.5 w-1.5 bg-indigo-600 rounded-full mr-1.5"></span>
+                {{ $tickets->count() }} ticket(s)
+            </span>
+        </div>
+        
+        <div class="p-6">
+            @if($tickets->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($tickets as $ticket)
+                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                            <div class="border-l-4 
+                                {{ $ticket->status == 'open' ? 'border-green-500' : 
+                                   ($ticket->status == 'in_progress' ? 'border-blue-500' : 'border-gray-400') }}">
                                 <div class="p-5">
                                     <h3 class="text-lg font-medium text-gray-900">{{ $ticket->title }}</h3>
-                                    <p class="mt-2 text-sm text-gray-500">{{ Str::limit($ticket->description, 100) }}</p>
-                                    <div class="mt-4 flex justify-between items-center">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <p class="mt-2 text-sm text-gray-500">{{ Str::limit($ticket->description, 80) }}</p>
+                                    
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                             {{ $ticket->status == 'open' ? 'bg-green-100 text-green-800' : 
                                                ($ticket->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                            <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                                {{ $ticket->status == 'open' ? 'bg-green-600' : 
+                                                   ($ticket->status == 'in_progress' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
                                             {{ ucfirst($ticket->status) }}
                                         </span>
+                                        
+                                        <div class="text-xs text-gray-500">
+                                            {{ $ticket->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4 pt-4 border-t border-gray-100">
                                         <a href="{{ route('tickets.show', $ticket) }}" 
-                                            class="text-sm text-indigo-500 hover:text-indigo-600 font-medium">
-                                            View Details →
+                                            class="w-full inline-flex justify-center items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-indigo-600 text-sm font-medium rounded transition-colors duration-200">
+                                            View Details
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-10 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <p class="text-gray-500 text-lg font-medium">No tickets found</p>
+                    <p class="text-gray-400 mt-1">Create your first ticket to get started</p>
+                    <div class="mt-6">
+                        <a href="{{ route('tickets.create') }}" 
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Create Ticket
+                        </a>
                     </div>
-                @else
-                    <div class="text-center py-12">
-                        <p class="text-gray-500">No tickets found. Create your first ticket to get started.</p>
-                    </div>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
