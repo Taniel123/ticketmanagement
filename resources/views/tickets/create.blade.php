@@ -1,5 +1,3 @@
-<!-- resources/views/tickets/create.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
@@ -54,21 +52,6 @@
                         @enderror
                     </div>
 
-                    <!-- Status Dropdown -->
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Initial Status</label>
-                        <select name="status" id="status" 
-                            class="mt-1 block w-full bg-gray-50 border border-gray-300 text-gray-700 py-2 px-3 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-sm"
-                            required>
-                            <option value="open">Open</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="closed">Closed</option>
-                        </select>
-                        @error('status')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
                     <!-- Submit Button -->
                     <div class="flex justify-end">
                         <button type="submit" 
@@ -81,4 +64,34 @@
         </div>
     </div>
 </div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #f8f9fa; padding: 20px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h4>New Ticket Created</h4>
+    <p id="ticketInfo">Your new ticket has been successfully created!</p>
+    <button onclick="closeNotification()">Okay</button>
+</div>
+
+<script>
+    // Show the notification modal
+    function showNotification(ticketTitle) {
+        const modal = document.getElementById('notificationModal');
+        const ticketInfo = document.getElementById('ticketInfo');
+        ticketInfo.innerHTML = 'Ticket Created: ' + ticketTitle;
+        modal.style.display = 'block';
+    }
+
+    // Close the notification modal
+    function closeNotification() {
+        const modal = document.getElementById('notificationModal');
+        modal.style.display = 'none';
+        window.location.href = "{{ route('user.dashboard') }}"; // Redirect to the user dashboard
+    }
+
+    // Trigger notification if the session has the 'ticket_created' variable
+    @if(session('ticket_created'))
+        showNotification("{{ session('ticket_created') }}");
+    @endif
+</script>
+
 @endsection

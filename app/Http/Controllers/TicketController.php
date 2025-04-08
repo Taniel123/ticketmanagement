@@ -36,25 +36,27 @@ class TicketController extends Controller
 
     // Store new ticket
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'priority' => 'required|in:low,medium,high',
-        ]);
+{
+    $validatedData = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'priority' => 'required|in:low,medium,high',
+    ]);
 
-        $ticket = Ticket::create([
-            'title' => $validatedData['title'],
-            'description' => $validatedData['description'],
-            'priority' => $validatedData['priority'],
-            'status' => 'open',
-            'user_id' => Auth::id(),
-            'created_by' => Auth::id()
-        ]);
+    // Create the ticket
+    $ticket = Ticket::create([
+        'title' => $validatedData['title'],
+        'description' => $validatedData['description'],
+        'priority' => $validatedData['priority'],
+        'status' => 'open',
+        'user_id' => Auth::id(),
+        'created_by' => Auth::id()
+    ]);
 
-        return redirect()->route('user.dashboard')
-            ->with('success', 'Ticket created successfully.');
-    }
+    // Redirect with success message and ticket title for popup notification
+    return redirect()->route('tickets.create')
+        ->with('ticket_created', $ticket->title);  // Pass ticket title to view for the popup
+}
 
     // Show single ticket
     public function show(Ticket $ticket)
@@ -93,23 +95,25 @@ class TicketController extends Controller
 
     // Update ticket
     public function update(Request $request, Ticket $ticket)
-    {
-        // Verify ownership or admin/support role
-        if (Auth::user()->role === 'user' && Auth::id() !== $ticket->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'priority' => 'required|in:low,medium,high',
-        ]);
-
-        $ticket->update($validatedData);
-
-        return redirect()->route('tickets.show', $ticket)
-            ->with('success', 'Ticket updated successfully.');
+{
+    // Verify ownership or admin/support role
+    if (Auth::user()->role === 'user' && Auth::id() !== $ticket->user_id) {
+        abort(403, 'Unauthorized action.');
     }
+
+    $validatedData = $request->validate([
+        'status' => 'required|in:open,ongoing,closed',
+    ]);
+
+    // Update ticket status
+    $ticket->update($validatedData);
+
+    // Flash message with ticket title
+    return redirect()->route('support.dashboard') // Adjust to your route
+        ->with('ticket_updated', 'The status of ticket ' . $ticket->title . ' has been updated.');
+}
+
+
 
     // Delete ticket (admin only)
     public function destroy(Ticket $ticket)
