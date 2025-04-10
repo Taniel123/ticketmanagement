@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use App\Notifications\TicketNotification;
 use App\Notifications\UserApprovedNotification;
+use App\Notifications\RoleChangeNotification;
 
 class AuthController extends Controller
 {
@@ -58,7 +59,7 @@ class AuthController extends Controller
             // Check if user is approved
             if (!$user->is_approved) {
                 return back()->withErrors([
-                    'email' => 'Your account is awaiting admin approval. You’ll be notified by email once approved.',
+                    'email' => 'Your account is pending admin approval. You will be notified via email once approved.',
                 ])->onlyInput('email');
             }
             
@@ -154,7 +155,9 @@ class AuthController extends Controller
         
         $pendingUsers = User::where('is_approved', false)->get();
         $users = User::where('is_approved', true)->get();
-        return view('dashboard.admin', compact('pendingUsers', 'users'));
+        $tickets = Ticket::with('user')->latest()->get();
+        
+        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets'));
     }
 
     // Show support dashboard
@@ -195,13 +198,19 @@ class AuthController extends Controller
 
     public function changeUserRole(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-        $oldRole = $user->role;
-        $user->update(['role' => $request->role]);
-        
-        // Send notification to user
-        $user->notify(new TicketNotification(null, 'user_role_changed', auth()->user()));
-        
-        return back()->with('success', 'User role updated successfully.');
+        try {
+            $user = User::findOrFail($id);
+            $oldRole = $user->role;
+            
+            // Update the role
+            $user->update(['role' => $request->role]);
+            
+            // Send notification using the new RoleChangeNotification
+            $user->notify(new RoleChangeNotification($request->role, auth()->user()));
+            
+            return back()->with('success', 'User role updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update user role: ' . $e->getMessage());
+        }
     }
 }

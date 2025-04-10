@@ -87,5 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.delete');
         Route::post('/change-role/{id}', [AuthController::class, 'changeUserRole'])
             ->name('admin.changeRole');
+        Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
+        ->name('admin.tickets.update-status');  // Changed name
     });
 });
