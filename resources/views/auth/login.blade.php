@@ -111,10 +111,10 @@
             </div>
         </form>
 
-        <div class="text-center mt-4">
-            <p class="text-sm text-gray-600">
-                Don't have an account? 
-                <a href="{{ route('register') }}" class="font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
+        <div class="mt-6 pt-4 border-t border-gray-200">
+            <p class="text-center text-sm text-black-600">
+                Don't have an account?
+                <a href="{{ route('register') }}" class="font-medium text-gray-800 hover:text-gray-900 underline">
                     Register here
                 </a>
             </p>
