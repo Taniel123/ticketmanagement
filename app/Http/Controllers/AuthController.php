@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use App\Notifications\TicketNotification;
 use App\Notifications\UserApprovedNotification;
@@ -36,21 +37,39 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
-        if (Auth::attempt($credentials, $remember)) {
-            $user = Auth::user();
+        // First check if the user exists
+        $user = User::where('email', $request->email)->first();
+        
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->onlyInput('email');
+        }
+        
+        // Check credentials without logging in the user yet
+        if (Auth::validate($credentials)) {
+            // Check email verification using hasVerifiedEmail() method
+            if (!$user->hasVerifiedEmail()) {
+                return back()->withErrors([
+                    'email' => 'You need to verify your email address first. Please check your email for the verification link.',
+                ])->onlyInput('email');
+            }
             
             // Check if user is approved
             if (!$user->is_approved) {
-                Auth::logout();
                 return back()->withErrors([
-                    'email' => 'Your account is pending approval. Please wait for admin approval.',
+                    'email' => 'Your account is pending admin approval. You will be notified via email once approved.',
                 ])->onlyInput('email');
             }
-
+            
+            // All checks passed, now actually log in the user
+            Auth::login($user, $remember);
             $request->session()->regenerate();
+            
             return redirect()->route($user->role . '.dashboard');
         }
-
+        
+        // Invalid password
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
@@ -65,25 +84,43 @@ class AuthController extends Controller
     // Handle registration logic
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'user',
-            'is_approved' => false // Make sure user starts as unapproved
-        ]);
+            DB::beginTransaction();
 
-        event(new Registered($user));
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'user',
+                'is_approved' => false,
+                'email_verified_at' => null
+            ]);
 
-        // Instead of logging in, redirect to a waiting page
-        return redirect()->route('login')
-            ->with('success', 'Registration successful! Please wait for admin approval before logging in.');
+            if (!$user) {
+                throw new \Exception('Failed to create user');
+            }
+
+            // Send verification email
+            event(new Registered($user));
+
+            DB::commit();
+
+            // Redirect to login with success message
+            return redirect()->route('login')
+                ->with('success', 'Registration successful! Please check your email to verify your account.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors([
+                'error' => 'Registration failed. Please try again. ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 
     // Handle logout

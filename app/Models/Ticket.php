@@ -36,6 +36,7 @@ class Ticket extends Model
         });
     }
 
+    // Defines relationship with User model
     public function user()
     {
         return $this->belongsTo(User::class);
