@@ -6,23 +6,39 @@ use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\TicketNotification;
+use App\Models\User;
+use App\Notifications\TicketUpdateNotification;
+
 
 class TicketController extends Controller
 {
     // Index - Get all tickets based on user role
     public function index()
     {
-        if (Auth::user()->role === 'admin') {
-            $tickets = Ticket::with('user')->latest()->get();
-        } elseif (Auth::user()->role === 'support') {
-            $tickets = Ticket::with('user')
-                ->whereIn('status', ['open', 'ongoing'])
-                ->latest()
-                ->get();
-        } else {
-            $tickets = Ticket::where('user_id', Auth::id())
-                ->latest()
-                ->get();
+        $user = Auth::user();
+        
+        switch ($user->role) {
+            case 'admin':
+                // Admin can see all tickets
+                $tickets = Ticket::with('user')
+                    ->latest()
+                    ->get();
+                break;
+                
+            case 'support':
+                // Support can see open and ongoing tickets
+                $tickets = Ticket::with('user')
+                    ->whereIn('status', ['open', 'ongoing'])
+                    ->latest()
+                    ->get();
+                break;
+                
+            default:
+                // Regular users can only see their own tickets
+                $tickets = Ticket::where('user_id', Auth::id())
+                    ->latest()
+                    ->get();
+                break;
         }
 
         return view('tickets.index', compact('tickets'));
@@ -65,47 +81,47 @@ class TicketController extends Controller
             ->with('success', 'Ticket created successfully.');
     }
 
-    // Show single ticket
+    // Show individual ticket
     public function show(Ticket $ticket)
     {
-        // Check if user can view this ticket
-        if (Auth::user()->role === 'user' && Auth::id() !== $ticket->user_id) {
-            abort(403, 'Unauthorized action.');
+        // Check if user has permission to view this ticket
+        if (Auth::user()->role === 'user' && $ticket->user_id !== Auth::id()) {
+            return redirect()->route('tickets.index')
+                ->with('error', 'You are not authorized to view this ticket.');
         }
 
-        $ticket->load('user');
         return view('tickets.show', compact('ticket'));
     }
 
-    // Update ticket status
+    // Update ticket status (admin and support only)
     public function updateStatus(Request $request, Ticket $ticket)
     {
-        if (!in_array(auth()->user()->role, ['support', 'admin'])) {
-            abort(403, 'Unauthorized action.');
+        try {
+            // Validate request
+            $request->validate([
+                'status' => 'required|in:open,ongoing,closed'
+            ]);
+
+            // Store old status
+            $oldStatus = $ticket->status;
+
+            // Update ticket status
+            $ticket->update([
+                'status' => $request->status
+            ]);
+
+            // Notify the ticket owner
+            $ticket->user->notify(new TicketUpdateNotification(
+                $ticket,
+                auth()->user(),
+                $oldStatus,
+                $request->status
+            ));
+
+            return back()->with('success', 'Ticket status updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
         }
-
-        $request->validate([
-            'status' => 'required|in:open,ongoing,closed'
-        ]);
-
-        $oldStatus = $ticket->status;
-        $ticket->status = $request->status;
-        $ticket->save();
-
-        // Notify ticket owner
-        $ticket->user->notify(new TicketNotification(
-            $ticket, 
-            'status_updated', 
-            auth()->user(),
-            $oldStatus
-        ));
-
-        // If closed, send additional notification
-        if ($request->status === 'closed' && $oldStatus !== 'closed') {
-            $ticket->user->notify(new TicketNotification($ticket, 'closed', auth()->user()));
-        }
-
-        return redirect()->back()->with('success', 'Ticket status updated successfully');
     }
 
     // Update ticket
