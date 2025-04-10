@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class EmailVerificationController extends Controller
 {
@@ -14,24 +16,45 @@ class EmailVerificationController extends Controller
         return view('auth.verify-email');
     }
 
-    public function verify(EmailVerificationRequest $request)
+    public function verify(Request $request, $id)
     {
-        $request->fulfill();
-        
-        // Logout the user
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            DB::beginTransaction();
+            
+            // Find the user
+            $user = User::findOrFail($id);
+            
+            // Verify hash matches
+            if (!hash_equals(sha1($user->getEmailForVerification()), $request->hash)) {
+                throw new \Exception('Invalid verification link');
+            }
 
-        // Flash a more visible success message
-        return redirect()->route('login')
-            ->with('success', 'Email verification successful! You can now log in to access your account.');
+            // Check if already verified
+            if ($user->hasVerifiedEmail()) {
+                return redirect()->route('login')
+                    ->with('success', 'Email already verified. You can now login.');
+            }
+
+            // Mark email as verified
+            $user->forceFill([
+                'email_verified_at' => Carbon::now()
+            ])->save();
+
+            DB::commit();
+
+            return redirect()->route('login')
+                ->with('success', 'Email verified successfully! Please wait for admin approval before logging in.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('login')
+                ->with('error', 'Verification failed: ' . $e->getMessage());
+        }
     }
 
     public function resend(Request $request)
     {
         $request->user()->sendEmailVerificationNotification();
-
-        return back()->with('message', 'Verification link sent!');
+        return back()->with('status', 'verification-link-sent');
     }
 }
