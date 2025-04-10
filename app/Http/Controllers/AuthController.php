@@ -58,7 +58,7 @@ class AuthController extends Controller
             // Check if user is approved
             if (!$user->is_approved) {
                 return back()->withErrors([
-                    'email' => 'Your account is pending admin approval. You will be notified via email once approved.',
+                    'email' => 'Your account is awaiting admin approval. You’ll be notified by email once approved.',
                 ])->onlyInput('email');
             }
             
