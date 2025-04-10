@@ -12,20 +12,7 @@
             <p class="text-sm text-gray-500 mt-1 ml-5">Overview and management of all user tickets</p>
         </div>
         
-        <!-- Quick Stats Summary -->
-        <div class="mt-4 md:mt-0 flex space-x-3">
-            <div class="bg-indigo-100 rounded-lg px-4 py-2 flex items-center">
-                <div class="p-2 bg-indigo-600 rounded-md mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                    </svg>
-                </div>
-                <div>
-                    <span class="text-xs text-indigo-700 font-medium">Total Tickets</span>
-                    <p class="text-lg font-semibold text-indigo-800">{{ count($tickets) }}</p>
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <!-- Main Card -->
@@ -38,7 +25,7 @@
             </h2>
             <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center">
                 <span class="h-1.5 w-1.5 bg-indigo-600 rounded-full mr-1.5"></span>
-                {{ count($tickets) }} ticket(s) found
+                {{ count($tickets) }} ticket(s)
             </span>
         </div>
 

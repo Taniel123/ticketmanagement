@@ -14,34 +14,8 @@
             <p class="text-sm text-gray-500 mt-1 ml-5">View and manage your support tickets</p>
         </div>
         
-        <!-- Quick Stats -->
-        <div class="mt-4 md:mt-0 flex space-x-3">
-            <div class="bg-indigo-100 rounded-lg px-4 py-2 flex items-center">
-                <div class="p-2 bg-indigo-600 rounded-md mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                </div>
-                <div>
-                    <span class="text-xs text-indigo-700 font-medium">Your Tickets</span>
-                    <p class="text-lg font-semibold text-indigo-800">{{ $tickets->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 hover:shadow-md transition-all duration-300">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
-                Quick Actions
-            </h2>
-        </div>
         <div class="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-500">Create and manage your support tickets</p>
-            </div>
             <a href="{{ route('tickets.create') }}" 
                 class="mt-4 sm:mt-0 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +24,12 @@
                 Create New Ticket
             </a>
         </div>
+
     </div>
+
+
+
+   
 
     <!-- Tickets List -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
