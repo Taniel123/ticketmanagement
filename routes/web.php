@@ -39,18 +39,18 @@ Route::post('reset-password', [ResetPasswordController::class, 'reset'])
     ->middleware('guest')
     ->name('password.update');
 
-// Email verification routes
+   //DAPAT NASA LABAS TO NG MIDDLEWARE PARA GUMANA YUNG VERIFICATION EMAIL
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed'])
+    ->name('verification.verify');
+
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
         ->name('verification.notice');
-        
-    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-        ->middleware(['signed'])
-        ->name('verification.verify');
-        
-    Route::post('/email/resend', [EmailVerificationController::class, 'resend'])
+    
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
         ->middleware(['throttle:6,1'])
-        ->name('verification.resend');
+        ->name('verification.send');
 });
 
 // Protected routes requiring authentication and email verification
