@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use App\Notifications\TicketNotification;
+use App\Notifications\UserApprovedNotification;
 
 class AuthController extends Controller
 {
@@ -31,17 +33,27 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Store user in session
-            auth()->login($user); // This logs the user in
+        if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+            
+            // Check if user is approved
+            if (!$user->is_approved) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account is pending approval. Please wait for admin approval.',
+                ])->onlyInput('email');
+            }
 
-            // Redirect to respective dashboard
+            $request->session()->regenerate();
             return redirect()->route($user->role . '.dashboard');
         }
 
-        return back()->withErrors('Invalid email or password.');
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
     // Show registration form
@@ -63,15 +75,15 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Set default role
-            'is_approved' => false // Set default approval status
+            'role' => 'user',
+            'is_approved' => false // Make sure user starts as unapproved
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect()->route('verification.notice');
+        // Instead of logging in, redirect to a waiting page
+        return redirect()->route('login')
+            ->with('success', 'Registration successful! Please wait for admin approval before logging in.');
     }
 
     // Handle logout
@@ -87,24 +99,34 @@ class AuthController extends Controller
     // Show user dashboard
     public function showUserDashboard()
     {
+        if (auth()->user()->role !== 'user') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $user = Auth::user();
         $tickets = $user->tickets()->latest()->get();
-        
         return view('dashboard.user', compact('tickets'));
     }
 
     // Show admin dashboard
     public function showAdminDashboard()
     {
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $pendingUsers = User::where('is_approved', false)->get();
         $users = User::where('is_approved', true)->get();
-        
         return view('dashboard.admin', compact('pendingUsers', 'users'));
     }
 
     // Show support dashboard
     public function showSupportDashboard()
     {
+        if (auth()->user()->role !== 'support') {
+            return redirect()->route(auth()->user()->role . '.dashboard');
+        }
+        
         $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->get();
         return view('dashboard.support', compact('tickets'));
     }
@@ -115,7 +137,10 @@ class AuthController extends Controller
         $user = User::findOrFail($id);
         $user->update(['is_approved' => true]);
         
-        return back()->with('success', 'User approved successfully.');
+        // Send approval notification
+        $user->notify(new UserApprovedNotification());
+        
+        return back()->with('success', 'User approved successfully. An email notification has been sent.');
     }
 
     // Delete User
@@ -134,7 +159,11 @@ class AuthController extends Controller
     public function changeUserRole(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $oldRole = $user->role;
         $user->update(['role' => $request->role]);
+        
+        // Send notification to user
+        $user->notify(new TicketNotification(null, 'user_role_changed', auth()->user()));
         
         return back()->with('success', 'User role updated successfully.');
     }
