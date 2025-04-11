@@ -153,9 +153,9 @@ class AuthController extends Controller
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
         
-        $pendingUsers = User::where('is_approved', false)->get();
-        $users = User::where('is_approved', true)->get();
-        $tickets = Ticket::with('user')->latest()->get();
+        $pendingUsers = User::where('is_approved', false)->paginate(3);
+        $users = User::where('is_approved', true)->paginate(3);
+        $tickets = Ticket::with('user')->latest()->paginate(3);
         
         return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets'));
     }
