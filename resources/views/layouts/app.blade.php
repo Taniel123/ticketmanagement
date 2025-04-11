@@ -63,7 +63,7 @@
         <div class="flex flex-1">
             <!-- Sidebar -->
             <aside id="sidebar"
-                class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 h-full shadow-md">
+            class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 min-h-screen shadow-md flex flex-col">
                 <div class="h-full flex flex-col">
                     <div class="px-4 py-5 bg-indigo-50 border-b border-gray-200">
                         <div class="flex items-center">
