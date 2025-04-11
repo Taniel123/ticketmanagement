@@ -7,18 +7,11 @@
     @vite('resources/css/app.css')
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        #sidebar {
-    height: 100vh; /* Full viewport height */
-    /* or */
-    height: 800px; /* Fixed pixel height */
-}
-    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <div class="min-h-screen flex flex-col">
 
-        <nav class="bg-white text-gray-800 shadow-sm border-b border-gray-200 sticky top-0 z-40 h-200">
+        <nav class="bg-white text-gray-800 shadow-sm border-b border-gray-200 sticky top-0 z-40">
             <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <!-- Left Side: Hamburger and Title -->
@@ -70,8 +63,8 @@
         <div class="flex flex-1">
             <!-- Sidebar -->
             <aside id="sidebar"
-    class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 h-full shadow-[0_0_10px_rgba(0,0,0,0.1)] shadow-r-md shadow-t-md shadow-l-md">
-    <div class="h-full flex flex-col">
+                class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 h-full shadow-md">
+                <div class="h-full flex flex-col">
                     <div class="px-4 py-5 bg-indigo-50 border-b border-gray-200">
                         <div class="flex items-center">
                             <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
@@ -106,7 +99,7 @@
                         </div>
                     </div>
 
-                    <nav class="flex-1 px-3 py-4 space-y-10 h-full">
+                    <nav class="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
                         <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold px-3 mb-1">Main</p>
                         <a href="#" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,7 +108,7 @@
                             </svg>
                             Dashboard
                         </a>
-                        </nav>
+                        
                 </div>
             </aside>
 
