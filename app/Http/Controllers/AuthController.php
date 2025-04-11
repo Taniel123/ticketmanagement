@@ -167,7 +167,7 @@ class AuthController extends Controller
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
         
-        $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->get();
+        $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->paginate(3);
         return view('dashboard.support', compact('tickets'));
     }
 
