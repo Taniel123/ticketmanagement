@@ -77,8 +77,9 @@ class TicketController extends Controller
             $supportUser->notify(new TicketNotification($ticket, 'new_ticket_for_support', auth()->user()));
         }
 
-        return redirect()->route('user.dashboard')
-            ->with('success', 'Ticket created successfully.');
+        // Redirect with success message and ticket title for popup notification
+        return redirect()->route('tickets.create')
+        ->with('ticket_created', $ticket->title);  // Pass ticket title to view for the popup
     }
 
     // Show individual ticket
