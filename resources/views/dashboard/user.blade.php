@@ -11,7 +11,6 @@
                 <div class="h-8 w-2 bg-indigo-600 rounded-full mr-3"></div>
                 User Dashboard
             </h1>
-            <p class="text-sm text-gray-500 mt-1 ml-5">View and manage your support tickets</p>
         </div>
         
 

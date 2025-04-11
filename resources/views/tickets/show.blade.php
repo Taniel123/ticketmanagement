@@ -9,11 +9,10 @@
                 <div class="h-8 w-2 bg-indigo-600 rounded-full mr-3"></div>
                 Ticket Details
             </h1>
-            <p class="text-sm text-gray-500 mt-1 ml-5">View and manage ticket information</p>
         </div>
         
         <!-- Quick Status -->
-        <div class="mt-4 md:mt-0">
+        <!-- <div class="mt-4 md:mt-0">
             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium
                 {{ $ticket->status == 'open' ? 'bg-green-100 text-green-800' : 
                    ($ticket->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
@@ -22,14 +21,14 @@
                        ($ticket->status == 'in_progress' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
                 {{ ucfirst($ticket->status) }}
             </span>
-        </div>
+        </div> -->
     </div>
 
     <!-- Ticket Information -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 mb-6">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-            <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+                <!-- <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span> -->
                 {{ $ticket->title }}
             </h2>
             <span class="text-sm text-gray-500">Created {{ $ticket->created_at->diffForHumans() }}</span>
@@ -37,20 +36,14 @@
         
         <div class="p-6">
     <div class="prose max-w-none break-words">
-        <p class="text-gray-700">{{ $ticket->description }}</p>
+        <dt class="text-sm font-medium text-gray-500">Description</dt>
+        <dd class="mt-1 text-sm text-gray-900">{{ $ticket->description }}</dd>
     </div>
 </div>
     </div>
 
     <!-- Ticket Metadata -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 mb-6">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
-                Ticket Details
-            </h2>
-        </div>
-        
         <div class="p-6">
             <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                 <div>
