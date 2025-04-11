@@ -36,10 +36,10 @@
         </div>
         
         <div class="p-6">
-            <div class="prose max-w-none">
-                <p class="text-gray-700">{{ $ticket->description }}</p>
-            </div>
-        </div>
+    <div class="prose max-w-none break-words">
+        <p class="text-gray-700">{{ $ticket->description }}</p>
+    </div>
+</div>
     </div>
 
     <!-- Ticket Metadata -->

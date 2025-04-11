@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Notifications\TicketNotification;
 class TicketController extends Controller
 {
     // Index - Get all tickets based on user role
