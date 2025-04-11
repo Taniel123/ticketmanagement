@@ -14,35 +14,35 @@ class TicketController extends Controller
 {
     // Index - Get all tickets based on user role
     public function index()
-    {
-        $user = Auth::user();
-        
-        switch ($user->role) {
-            case 'admin':
-                // Admin can see all tickets
-                $tickets = Ticket::with('user')
-                    ->latest()
-                    ->get();
-                break;
-                
-            case 'support':
-                // Support can see open and ongoing tickets
-                $tickets = Ticket::with('user')
-                    ->whereIn('status', ['open', 'ongoing'])
-                    ->latest()
-                    ->get();
-                break;
-                
-            default:
-                // Regular users can only see their own tickets
-                $tickets = Ticket::where('user_id', Auth::id())
-                    ->latest()
-                    ->get();
-                break;
-        }
-
-        return view('tickets.index', compact('tickets'));
+{
+    $user = Auth::user();
+    
+    switch ($user->role) {
+        case 'admin':
+            // Admin can see all tickets
+            $tickets = Ticket::with('user')
+                ->latest()
+                ->paginate(3); // Adjust per page count
+            break;
+            
+        case 'support':
+            // Support can see open and ongoing tickets
+            $tickets = Ticket::with('user')
+                ->whereIn('status', ['open', 'ongoing'])
+                ->latest()
+                ->paginate(3);
+            break;
+            
+        default:
+            // Regular users can only see their own tickets
+            $tickets = Ticket::where('user_id', Auth::id())
+                ->latest()
+                ->paginate(3);
+            break;
     }
+
+    return view('tickets.index', compact('tickets'));
+}
 
     // Show create form
     public function create()

@@ -142,7 +142,7 @@ class AuthController extends Controller
         }
         
         $user = Auth::user();
-        $tickets = $user->tickets()->latest()->get();
+        $tickets = $user->tickets()->latest()->paginate(3);
         return view('dashboard.user', compact('tickets'));
     }
 
