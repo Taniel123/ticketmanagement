@@ -109,7 +109,8 @@
                                 <div class="mt-4 md:mt-0 bg-gray-50 p-4 rounded-lg">
                                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Tickets</p>
                                     <p class="text-3xl font-bold text-gray-900 mt-1">
-                                        {{ $openTickets + $ongoingTickets + $closedTickets }}</p>
+                                        {{ $openTickets + $ongoingTickets + $closedTickets }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -128,111 +129,111 @@
                         </div>
                     </div>
 
-                    <<<<<<< HEAD <script>
+                    <script>
                         // Data for the chart
                         const ticketData = {
-                        labels: ['Open Tickets', 'Ongoing Tickets', 'Closed Tickets'],
-                        datasets: [{
-                        label: 'Tickets',
-                        data: [{{ $openTickets }}, {{ $ongoingTickets }}, {{ $closedTickets }}],
-                        backgroundColor: [
-                        'rgba(79, 70, 229, 0.75)', // Open Tickets (Indigo)
-                        'rgba(16, 185, 129, 0.75)', // Ongoing Tickets (Green)
-                        'rgba(107, 114, 128, 0.75)' // Closed Tickets (Gray)
-                        ],
-                        hoverBackgroundColor: [
-                        'rgba(79, 70, 229, 0.9)', // Open Tickets (Indigo)
-                        'rgba(16, 185, 129, 0.9)', // Ongoing Tickets (Green)
-                        'rgba(107, 114, 128, 0.9)' // Closed Tickets (Gray)
-                        ],
-                        borderColor: [
-                        'rgba(79, 70, 229, 1)', // Open Tickets (Indigo)
-                        'rgba(16, 185, 129, 1)', // Ongoing Tickets (Green)
-                        'rgba(107, 114, 128, 1)' // Closed Tickets (Gray)
-                        ],
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        barPercentage: 0.6
-                        }]
+                            labels: ['Open Tickets', 'Ongoing Tickets', 'Closed Tickets'],
+                            datasets: [{
+                                label: 'Tickets',
+                                data: [{{ $openTickets }}, {{ $ongoingTickets }}, {{ $closedTickets }}],
+                                backgroundColor: [
+                                    'rgba(79, 70, 229, 0.75)', // Open Tickets (Indigo)
+                                    'rgba(16, 185, 129, 0.75)', // Ongoing Tickets (Green)
+                                    'rgba(107, 114, 128, 0.75)' // Closed Tickets (Gray)
+                                ],
+                                hoverBackgroundColor: [
+                                    'rgba(79, 70, 229, 0.9)', // Open Tickets (Indigo)
+                                    'rgba(16, 185, 129, 0.9)', // Ongoing Tickets (Green)
+                                    'rgba(107, 114, 128, 0.9)' // Closed Tickets (Gray)
+                                ],
+                                borderColor: [
+                                    'rgba(79, 70, 229, 1)', // Open Tickets (Indigo)
+                                    'rgba(16, 185, 129, 1)', // Ongoing Tickets (Green)
+                                    'rgba(107, 114, 128, 1)' // Closed Tickets (Gray)
+                                ],
+                                borderWidth: 1,
+                                borderRadius: 8,
+                                barPercentage: 0.6
+                            }]
                         };
 
                         // Configuration for the chart
                         const config = {
-                        type: 'bar',
-                        data: ticketData,
-                        options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                        legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                        padding: 20,
-                        boxWidth: 12,
-                        usePointStyle: true,
-                        font: {
-                        size: 12,
-                        family: "'Inter', sans-serif",
-                        weight: '500'
-                        },
-                        color: '#374151'
-                        }
-                        },
-                        tooltip: {
-                        backgroundColor: 'rgba(17, 24, 39, 0.85)',
-                        titleFont: { size: 13, weight: '600', family: "'Inter', sans-serif" },
-                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
-                        padding: 12,
-                        cornerRadius: 6,
-                        displayColors: true,
-                        callbacks: {
-                        label: function(context) {
-                        const percentage = Math.round((context.raw / ({{ $openTickets + $ongoingTickets + $closedTickets }})
-                        * 100));
-                        return `${context.label}: ${context.raw} (${percentage}%)`;
-                        }
-                        }
-                        }
-                        },
-                        scales: {
-                        x: {
-                        grid: {
-                        display: false
-                        },
-                        ticks: {
-                        font: {
-                        size: 12,
-                        family: "'Inter', sans-serif"
-                        },
-                        color: '#4B5563'
-                        }
-                        },
-                        y: {
-                        beginAtZero: true,
-                        grid: {
-                        color: 'rgba(243, 244, 246, 1)',
-                        drawBorder: false
-                        },
-                        ticks: {
-                        font: {
-                        size: 12,
-                        family: "'Inter', sans-serif"
-                        },
-                        color: '#4B5563',
-                        precision: 0
-                        }
-                        }
-                        }
-                        }
+                            type: 'bar',
+                            data: ticketData,
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 20,
+                                            boxWidth: 12,
+                                            usePointStyle: true,
+                                            font: {
+                                                size: 12,
+                                                family: "'Inter', sans-serif",
+                                                weight: '500'
+                                            },
+                                            color: '#374151'
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(17, 24, 39, 0.85)',
+                                        titleFont: { size: 13, weight: '600', family: "'Inter', sans-serif" },
+                                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                                        padding: 12,
+                                        cornerRadius: 6,
+                                        displayColors: true,
+                                        callbacks: {
+                                            label: function (context) {
+                                                const percentage = Math.round((context.raw / ({{ $openTickets + $ongoingTickets + $closedTickets }})
+                                                    * 100));
+                                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            font: {
+                                                size: 12,
+                                                family: "'Inter', sans-serif"
+                                            },
+                                            color: '#4B5563'
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(243, 244, 246, 1)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            font: {
+                                                size: 12,
+                                                family: "'Inter', sans-serif"
+                                            },
+                                            color: '#4B5563',
+                                            precision: 0
+                                        }
+                                    }
+                                }
+                            }
                         };
 
                         // Render the chart
-                        document.addEventListener('DOMContentLoaded', function() {
-                        const ctx = document.getElementById('ticketStatisticsChart').getContext('2d');
-                        new Chart(ctx, config);
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const ctx = document.getElementById('ticketStatisticsChart').getContext('2d');
+                            new Chart(ctx, config);
                         });
-                        </script>
+                    </script>
                 </div>
 
             </div>

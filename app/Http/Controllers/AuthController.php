@@ -178,7 +178,7 @@ class AuthController extends Controller
                             
         $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
         
-        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets', 'totalTickets', 'openTickets', 'ongoingTickets', 'closedTickets'));
+        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets', 'archivedUsers', 'totalTickets', 'openTickets', 'ongoingTickets', 'closedTickets'));
 
     }
 
