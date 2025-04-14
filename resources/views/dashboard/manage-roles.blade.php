@@ -7,41 +7,41 @@
         <div
             class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
-        <!-- Left Title -->
-        <h1 class="text-xl font-medium text-gray-800 flex items-center">
-            <span class="w-1 h-8 bg-blue-500 rounded mr-2"></span>
-            Manage Users
-        </h1>
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
+                    <!-- Left Title -->
+                    <h1 class="text-xl font-medium text-gray-800 flex items-center">
+                        <span class="w-1 h-8 bg-blue-500 rounded mr-2"></span>
+                        Manage Users
+                    </h1>
 
-        <!-- Filters and Search -->
-        <form id="filterForm" method="GET" action="{{ route('admin.manage-roles') }}"
-            class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-            <!-- Role Dropdown -->
-            <select name="role"
-                class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">All Roles</option>
-                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                <option value="support" {{ request('role') == 'support' ? 'selected' : '' }}>Support</option>
-                <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
-            </select>
+                    <!-- Filters and Search -->
+                    <form id="filterForm" method="GET" action="{{ route('admin.manage-roles') }}"
+                        class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                        <!-- Role Dropdown -->
+                        <select name="role"
+                            class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Roles</option>
+                            <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="support" {{ request('role') == 'support' ? 'selected' : '' }}>Support</option>
+                            <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
+                        </select>
 
-            <!-- Status Dropdown -->
-            <select name="status"
-                class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">All Statuses</option>
-                <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Pending</option>
-            </select>
+                        <!-- Status Dropdown -->
+                        <select name="status"
+                            class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="">All Statuses</option>
+                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Pending</option>
+                        </select>
 
-            <!-- Search Input -->
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name..."
-                class="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </form>
-    </div>
-</div>
+                        <!-- Search Input -->
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name..."
+                            class="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </form>
+                </div>
+            </div>
 
-            
+
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead>
@@ -65,10 +65,10 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->email }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                        {{ $user->role == 'admin' ? 'bg-purple-100 text-purple-800' :
+                                                                                            {{ $user->role == 'admin' ? 'bg-purple-100 text-purple-800' :
                             ($user->role == 'support' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
                                                     <span class="h-1.5 w-1.5 mr-1.5 rounded-full
-                                                                            {{ $user->role == 'admin' ? 'bg-purple-600' :
+                                                                                                {{ $user->role == 'admin' ? 'bg-purple-600' :
                             ($user->role == 'support' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
                                                     {{ ucfirst($user->role) }}
                                                 </span>
@@ -76,10 +76,10 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                        {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                                                            {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                     <span
                                                         class="h-1.5 w-1.5 mr-1.5 rounded-full 
-                                                                            {{ $user->is_approved ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
+                                                                                                {{ $user->is_approved ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
                                                     {{ $user->is_approved ? 'Active' : 'Pending' }}
                                                 </span>
                                             </td>
