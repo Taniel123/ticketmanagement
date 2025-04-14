@@ -123,6 +123,16 @@
    User Approval
 </a>
 
+ <!-- Archive Users -->
+ <a href="{{ route('admin.archive-users') }}" 
+       class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg 
+              {{ Route::is('admin.archive-users') ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600' : 'hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 hover:border-l-4 hover:border-indigo-600' }}">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{ Route::is('admin.archive-users') ? 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h1V7a2 2 0 012-2h2a2 2 0 012 2v2h-2a2 2 0 00-2 2v1h-1a4 4 0 00-4 4v2H9z" />
+        </svg>
+        Archive Users
+    </a>
+
 <!-- Manage Roles -->
 <a href="{{ route('admin.manage-roles') }}" 
    class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg 

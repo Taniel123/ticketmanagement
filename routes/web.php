@@ -92,7 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users/pending', [AdminController::class, 'pendingUsers'])->name('admin.pending-users');
     Route::get('/roles/manage', [AdminController::class, 'manageRoles'])->name('admin.manage-roles');
     Route::get('/tickets/manage', [AdminController::class, 'manageTickets'])->name('admin.manage-tickets');
-
+    Route::get('/admin/archive-users', [AdminController::class, 'archiveUsers'])->name('admin.archive-users');
 
         Route::post('/archive/{id}', [AuthController::class, 'archiveUser'])
             ->name('admin.archive');

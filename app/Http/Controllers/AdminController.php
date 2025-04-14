@@ -19,7 +19,13 @@ class AdminController extends Controller
     $pendingUsers = User::where('is_approved', false)->paginate(10);
         return view('dashboard.pending-users' , compact('pendingUsers'));
     }
+public function archiveUsers()
+{
+    // Fetch archived users
+    $archivedUsers = User::where('is_archived', true)->paginate(10);
 
+    return view('dashboard.archive-users', compact('archivedUsers'));
+}
     /**
      * Show the Manage Roles page.
      */
