@@ -46,10 +46,17 @@ class AuthController extends Controller
                 'email' => 'The provided credentials do not match our records.',
             ])->onlyInput('email');
         }
+
+        // Check if user is archived
+        if ($user->is_archived) {
+            return back()->withErrors([
+                'email' => 'This account has been archived. Please contact support.',
+            ])->onlyInput('email');
+        }
         
         // Check credentials without logging in the user yet
         if (Auth::validate($credentials)) {
-            // Check email verification using hasVerifiedEmail() method
+            // Email verification check not needed if already verified
             if (!$user->hasVerifiedEmail()) {
                 return back()->withErrors([
                     'email' => 'You need to verify your email address first. Please check your email for the verification link.',
@@ -63,14 +70,10 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
             
-            // All checks passed, now actually log in the user
             Auth::login($user, $remember);
-            $request->session()->regenerate();
-            
             return redirect()->route($user->role . '.dashboard');
         }
-        
-        // Invalid password
+
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
@@ -150,14 +153,23 @@ class AuthController extends Controller
     public function showAdminDashboard()
     {
         if (auth()->user()->role !== 'admin') {
-            return redirect()->route(auth()->user()->role . '.dashboard');
+            abort(403);
         }
         
-        $pendingUsers = User::where('is_approved', false)->paginate(3);
-        $users = User::where('is_approved', true)->paginate(3);
-        $tickets = Ticket::with('user')->latest()->paginate(3);
+        $pendingUsers = User::where('is_approved', false)
+                           ->where('is_archived', false)
+                           ->paginate(3, ['*'], 'pending_page');
+                           
+        $users = User::where('is_approved', true)
+                     ->where('is_archived', false)
+                     ->paginate(3, ['*'], 'users_page');
+                     
+        $archivedUsers = User::where('is_archived', true)
+                            ->paginate(3, ['*'], 'archived_page');
+                            
+        $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
         
-        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets'));
+        return view('dashboard.admin', compact('pendingUsers', 'users', 'archivedUsers', 'tickets'));
     }
 
     // Show support dashboard
@@ -211,6 +223,40 @@ class AuthController extends Controller
             return back()->with('success', 'User role updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to update user role: ' . $e->getMessage());
+        }
+    }
+
+    public function archiveUser($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            
+            if ($user->role === 'admin') {
+                return redirect()->back()->with('error', 'Cannot archive an admin user');
+            }
+            
+            $result = $user->update([
+                'is_archived' => true
+            ]);
+
+            if ($result) {
+                return redirect()->back()->with('success', 'User has been archived successfully');
+            }
+            
+            return redirect()->back()->with('error', 'Failed to archive user');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to archive user: ' . $e->getMessage());
+        }
+    }
+
+    public function unarchiveUser($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->update(['is_archived' => false]);
+            return redirect()->back()->with('success', 'User unarchived successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to unarchive user');
         }
     }
 }

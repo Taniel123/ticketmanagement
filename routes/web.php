@@ -88,6 +88,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/change-role/{id}', [AuthController::class, 'changeUserRole'])
             ->name('admin.changeRole');
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
-        ->name('admin.tickets.update-status');  // Changed name
+            ->name('admin.tickets.update-status');  // Changed name
+        Route::post('/archive/{id}', [AuthController::class, 'archiveUser'])
+            ->name('admin.archive');
     });
+
+    Route::put('/users/{id}/unarchive', [AuthController::class, 'unarchiveUser'])->name('users.unarchive');
 });
