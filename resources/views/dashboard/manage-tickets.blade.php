@@ -6,9 +6,9 @@
      <div
                 class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                    <h1 class="text-3xl font-medium text-gray-800 flex items-center">
+                    <h1 class="text-xl font-medium text-gray-800 flex items-center">
                     <span class="w-1 h-8 bg-blue-500 rounded mr-2"></span>
-                        All Tickets
+                        Manage Tickets
                     </h1>
                     <span
                     class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center">
