@@ -64,7 +64,7 @@
     </div>
 
     <!-- Status Update Form (Admin/Support Only) -->
-    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'support')
+    <!-- @if(auth()->user()->role === 'admin' || auth()->user()->role === 'support')
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 mb-6">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <h2 class="text-lg font-medium text-gray-800 flex items-center">
@@ -93,11 +93,11 @@
                 </form>
             </div>
         </div>
-    @endif
+    @endif -->
 
     <!-- Action Button -->
     <div class="flex">
-        <a href="{{ route('user.dashboard') }}" 
+        <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard') }}" 
             class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />

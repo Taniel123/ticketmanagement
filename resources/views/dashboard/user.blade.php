@@ -136,16 +136,6 @@
                         </svg>
                         <p class="text-gray-500 text-lg font-medium">No tickets found</p>
                         <p class="text-gray-400 mt-1">Create your first ticket to get started</p>
-                        <div class="mt-6">
-                            <a href="{{ route('tickets.create') }}"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Create Ticket
-                            </a>
-                        </div>
                     </div>
                 @endif
             </div>
