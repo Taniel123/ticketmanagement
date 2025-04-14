@@ -89,7 +89,7 @@
     onclick="openRoleModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->role }}')"
     class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm"
 >
-    Edit Role
+    Edit
 </button>
                                             </td>
                                         </tr>
@@ -201,7 +201,7 @@
 </div>
 
 
-
+@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('filterForm');
@@ -241,3 +241,4 @@
         document.getElementById('roleModal').classList.remove('flex');
     }
 </script>
+@endsection

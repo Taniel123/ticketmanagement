@@ -43,15 +43,34 @@ class AdminController extends Controller
 
     return view('dashboard.manage-roles', compact('users'));
 }
+public function manageTickets(Request $request)
+{
+    $query = Ticket::query();
 
-
-    /**
-     * Show the Manage Tickets page.
-     */
-    public function manageTickets()
-    {
-        $tickets = Ticket::whereIn('status', ['open', 'in_progress'])->latest()->get();
-        $tickets = Ticket::paginate(10);
-        return view('dashboard.manage-tickets', compact('tickets'));
+    // Apply search filter (search by title or any other field)
+    if ($request->filled('search')) {
+        $query->where('title', 'like', '%' . $request->search . '%'); // or another field like ticket ID
     }
+
+    // Apply status filter
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Apply priority filter (if you have it)
+    if ($request->filled('priority')) {
+        $query->where('priority', $request->priority);
+    }
+
+    // Apply date filters (if you want)
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+    }
+
+    // Fetch tickets with pagination
+    $tickets = $query->paginate(10);
+
+    return view('dashboard.manage-tickets', compact('tickets'));
+}
+
 }
