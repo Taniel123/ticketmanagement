@@ -89,5 +89,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.changeRole');
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
         ->name('admin.tickets.update-status');  // Changed name
+        Route::get('/admin/users/pending', [AdminController::class, 'pendingUsers'])->name('admin.pending-users');
+    Route::get('/roles/manage', [AdminController::class, 'manageRoles'])->name('admin.manage-roles');
+    Route::get('/tickets/manage', [AdminController::class, 'manageTickets'])->name('admin.manage-tickets');
+
+
     });
+
+
 });

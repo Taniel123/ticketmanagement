@@ -60,58 +60,6 @@
         </nav>
 
 
-        <div class="flex flex-1">
-            <!-- Sidebar -->
-            <aside id="sidebar"
-            class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 min-h-screen shadow-md flex flex-col">
-                <div class="h-full flex flex-col">
-                    <div class="px-4 py-5 bg-indigo-50 border-b border-gray-200">
-                        <div class="flex items-center">
-                            <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-    <h3 class="text-sm font-semibold">
-        @if (Auth::user()->role === 'admin')
-            Admin
-        @elseif (Auth::user()->role === 'support')
-            Support
-        @else
-            User
-        @endif
-    </h3>
-    <div class="flex items-center mt-1">
-        <span class="bg-green-500 h-2 w-2 rounded-full"></span>
-        <p class="text-xs text-gray-500 ml-1">
-            @if (Auth::user()->role === 'admin')
-                Administrator
-            @elseif (Auth::user()->role === 'support')
-                Support Staff
-            @else
-                Regular User
-            @endif
-        </p>
-    </div>
-</div>
-                        </div>
-                    </div>
-
-                    <nav class="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
-                        <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold px-3 mb-1">Main</p>
-                        <a href="#" class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            Dashboard
-                        </a>
-                        
-                </div>
-            </aside>
-
             <!-- Main Content -->
             <main class="flex-1 overflow-auto focus:outline-none bg-gray-50">
                 <div class="py-6 px-4 sm:px-6 lg:px-8">

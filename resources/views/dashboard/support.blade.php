@@ -61,7 +61,7 @@
                                                 <span
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                     {{ $ticket->status == 'open' ? 'bg-green-100 text-green-800' :
-                            ($ticket->status == 'ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                            ($ticket->status == 'ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-blue-100 text-gray-800') }}">
                                                     <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
                                                         {{ $ticket->status == 'open' ? 'bg-green-600' :
                             ($ticket->status == 'ongoing' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>

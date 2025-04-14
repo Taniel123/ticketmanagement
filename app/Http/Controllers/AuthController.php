@@ -152,12 +152,17 @@ class AuthController extends Controller
         if (auth()->user()->role !== 'admin') {
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
-        
+           // Ticket statistics
+    $totalTickets = Ticket::count();
+    $openTickets = Ticket::where('status', 'open')->count();
+    $ongoingTickets = Ticket::where('status', 'ongoing')->count();
+    $closedTickets = Ticket::where('status', 'closed')->count();
+
         $pendingUsers = User::where('is_approved', false)->paginate(3);
         $users = User::where('is_approved', true)->paginate(3);
         $tickets = Ticket::with('user')->latest()->paginate(3);
         
-        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets'));
+        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets', 'totalTickets', 'openTickets', 'ongoingTickets', 'closedTickets'));
     }
 
     // Show support dashboard
