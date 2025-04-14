@@ -120,7 +120,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
-   User Approvals
+   User Approval
 </a>
 
 <!-- Manage Roles -->
@@ -131,7 +131,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M10 6H6a2 2 0 00-2 2v4m0 0v4a2 2 0 002 2h4m0-8h4m0 0h4a2 2 0 012 2v4m0 0v4a2 2 0 01-2 2h-4" />
     </svg>
-    Role Management
+    Manage Users
 </a>
 
 <!-- Manage Tickets -->
@@ -142,7 +142,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 17v-2a4 4 0 014-4h1V7a2 2 0 012-2h2a2 2 0 012 2v2h-2a2 2 0 00-2 2v1h-1a4 4 0 00-4 4v2H9z" />
     </svg>
-    Ticket Oversight
+    Manage Tickets
 </a>
         </nav>
     </div>

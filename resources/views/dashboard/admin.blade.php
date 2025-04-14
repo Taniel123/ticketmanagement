@@ -93,10 +93,10 @@
 </div>
 
 <!-- Ticket Statistics -->
-<div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base sm:text-lg font-medium text-gray-800">Ticket Statistics</h2>
-        <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Overview</span>
+<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-800">Ticket Statistics</h2>
+        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full">Overview</span>
     </div>
     <div class="relative">
         <canvas id="ticketStatisticsChart" width="400" height="200"></canvas>
@@ -108,19 +108,21 @@
     const ticketData = {
         labels: ['Open Tickets', 'Ongoing Tickets', 'Closed Tickets'],
         datasets: [{
-            label: 'Ticket Statistics',
+            label: 'Tickets',
             data: [{{ $openTickets }}, {{ $ongoingTickets }}, {{ $closedTickets }}],
             backgroundColor: [
-                'rgba(75, 192, 192, 0.2)', // Open Tickets
-                'rgba(54, 162, 235, 0.2)', // Ongoing Tickets
-                'rgba(201, 203, 207, 0.2)' // Closed Tickets
+                'rgba(99, 102, 241, 0.2)', // Open Tickets (Indigo)
+                'rgba(16, 185, 129, 0.2)', // Ongoing Tickets (Green)
+                'rgba(229, 231, 235, 0.2)' // Closed Tickets (Gray)
             ],
             borderColor: [
-                'rgba(75, 192, 192, 1)', // Open Tickets
-                'rgba(54, 162, 235, 1)', // Ongoing Tickets
-                'rgba(201, 203, 207, 1)' // Closed Tickets
+                'rgba(99, 102, 241, 1)', // Open Tickets (Indigo)
+                'rgba(16, 185, 129, 1)', // Ongoing Tickets (Green)
+                'rgba(107, 114, 128, 1)' // Closed Tickets (Gray)
             ],
-            borderWidth: 1
+            borderWidth: 2,
+            borderRadius: 5, // Rounded bars
+            barPercentage: 0.6 // Adjust bar width
         }]
     };
 
@@ -130,11 +132,15 @@
         data: ticketData,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'top',
+                    display: false // Hide legend for a cleaner look
                 },
                 tooltip: {
+                    backgroundColor: 'rgba(31, 41, 55, 0.9)', // Dark tooltip background
+                    titleFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
+                    bodyFont: { size: 12, family: 'Inter, sans-serif' },
                     callbacks: {
                         label: function(context) {
                             return `${context.label}: ${context.raw}`;
@@ -143,8 +149,30 @@
                 }
             },
             scales: {
+                x: {
+                    grid: {
+                        display: false // Hide vertical grid lines
+                    },
+                    ticks: {
+                        font: {
+                            size: 12,
+                            family: 'Inter, sans-serif'
+                        },
+                        color: '#4B5563' // Gray text
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    grid: {
+                        color: '#E5E7EB' // Light gray grid lines
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        font: {
+                            size: 12,
+                            family: 'Inter, sans-serif'
+                        },
+                        color: '#4B5563' // Gray text
+                    }
                 }
             }
         }
@@ -154,9 +182,6 @@
     const ctx = document.getElementById('ticketStatisticsChart').getContext('2d');
     new Chart(ctx, config);
 </script>
-
-
-
 
 
 
