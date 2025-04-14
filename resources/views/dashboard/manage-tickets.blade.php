@@ -16,10 +16,10 @@
                 <form id="filterForm" method="GET" action="{{ route('admin.manage-tickets') }}" class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
                     <!-- Status Dropdown -->
                     <select name="status" class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">All Statuses</option>
-                        <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Open</option>
-                        <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                        <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Closed</option>
+                        <option value="">All Status</option>
+                        <option value="Open" {{ request('status') == 'Open' ? 'selected' : '' }}>Open</option>
+                        <option value="Ongoing" {{ request('status') == 'Ongoing' ? 'selected' : '' }}>Ongoing</option>
+                        <option value="Closed" {{ request('status') == 'Closed' ? 'selected' : '' }}>Closed</option>
                     </select>
 
                     <!-- Priority Dropdown -->
@@ -68,17 +68,21 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap space-x-2">
                             <div class="flex items-center space-x-3">
-                                <a href="{{ route('tickets.show', $ticket) }}" class="text-indigo-600 hover:text-indigo-900">View Details</a>
-                                <form action="{{ route('admin.tickets.update-status', $ticket) }}" method="POST" class="inline-flex items-center space-x-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="status" class="w-32 bg-white border border-gray-300 text-gray-700 py-1.5 px-2 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm">
-                                        <option value="open" {{ $ticket->status === 'open' ? 'selected' : '' }}>Open</option>
-                                        <option value="ongoing" {{ $ticket->status === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
-                                        <option value="closed" {{ $ticket->status === 'closed' ? 'selected' : '' }}>Closed</option>
-                                    </select>
-                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">Update</button>
-                                </form>
+                            <a href="{{ route('tickets.show', $ticket) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">View</a>
+                            <button
+    type="button"
+    onclick="openTicketModal(
+        {{ $ticket->id }},
+        '{{ addslashes($ticket->title) }}',
+        '{{ addslashes($ticket->description) }}',
+        '{{ $ticket->priority }}',
+        '{{ addslashes($ticket->user->name) }}',
+        '{{ $ticket->status }}'
+    )"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm"
+>
+    Edit
+</button>
                             </div>
                         </td>
                     </tr>
@@ -133,6 +137,61 @@
 </div>
 @endsection
 
+<!-- Modal for Viewing Ticket -->
+<div id="openTicketModal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center backdrop-blur-xs">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-xl">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Update Ticket Details</h2>
+
+        <form id="ticketForm" method="POST">
+            @csrf
+            @method('PATCH')
+
+            <!-- Title -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Title:</label>
+                <p id="modalTitle" class="text-gray-900 mt-1 text-sm font-medium"></p>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Description:</label>
+                <p id="modalDescription" class="text-gray-800 mt-1 text-sm"></p>
+            </div>
+
+            <!-- Priority -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Priority:</label>
+                <p id="modalPriority" class="text-gray-900 mt-1 text-sm font-medium"></p>
+            </div>
+
+            <!-- Created By -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Created By:</label>
+                <p id="modalUser" class="text-gray-900 mt-1 text-sm font-medium"></p>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="mb-6">
+                <label for="modalStatus" class="block text-sm font-medium text-gray-700">Status:</label>
+                <select name="status" id="modalStatus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="Open">Open</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-4">
+                <button type="button" onclick="closeTicketModal()"
+                    class="text-gray-700 bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md text-sm font-medium">Cancel</button>
+                <button type="submit"
+                    class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-2 rounded-md text-sm font-semibold">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -155,6 +214,31 @@
             });
         }
     });
+
+    function openTicketModal(ticketId, title, description, priority, userName, status) {
+    // Populate modal fields
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDescription').textContent = description;
+    document.getElementById('modalPriority').textContent = priority;
+    document.getElementById('modalUser').textContent = userName;
+    document.getElementById('modalStatus').value = status;
+
+    // Update form action URL
+    const form = document.getElementById('ticketForm');
+    form.action = `/admin/tickets/${ticketId}/status`;
+
+    // Show modal
+    const modal = document.getElementById('openTicketModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeTicketModal() {
+    const modal = document.getElementById('openTicketModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 </script>
 @endsection
 

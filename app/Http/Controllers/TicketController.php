@@ -100,7 +100,7 @@ class TicketController extends Controller
         try {
             // Validate request
             $request->validate([
-                'status' => 'required|in:open,ongoing,closed'
+                'status' => 'required|in:Open,Ongoing,Closed'
             ]);
 
             // Store old status
