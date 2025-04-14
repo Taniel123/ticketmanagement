@@ -23,12 +23,27 @@ class AdminController extends Controller
     /**
      * Show the Manage Roles page.
      */
-    public function manageRoles()
-    {
-        $users = User::where('is_approved', true)->get();
-        $users = User::paginate(10);
-        return view('dashboard.manage-roles', compact('users'));
+    public function manageRoles(Request $request)
+{
+    $query = User::query();
+
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
     }
+
+    if ($request->filled('role')) {
+        $query->where('role', $request->role);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('is_approved', $request->status);
+    }
+
+    $users = $query->paginate(10);
+
+    return view('dashboard.manage-roles', compact('users'));
+}
+
 
     /**
      * Show the Manage Tickets page.
