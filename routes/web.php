@@ -94,7 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets/manage', [AdminController::class, 'manageTickets'])->name('admin.manage-tickets');
 
 
+        Route::post('/archive/{id}', [AuthController::class, 'archiveUser'])
+            ->name('admin.archive');
     });
 
-
+    Route::put('/users/{id}/unarchive', [AuthController::class, 'unarchiveUser'])->name('users.unarchive');
 });
