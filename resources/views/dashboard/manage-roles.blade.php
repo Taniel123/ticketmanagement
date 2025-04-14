@@ -84,19 +84,13 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <form action="{{ route('admin.changeRole', $user->id) }}" method="POST"
-                                                    class="flex items-center space-x-2">
-                                                    @csrf
-                                                    <select name="role" required
-                                                        class="w-32 bg-white border border-gray-300 text-gray-700 py-1.5 px-3 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm">
-                                                        <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
-                                                        <option value="support" {{ $user->role == 'support' ? 'selected' : '' }}>Support
-                                                        </option>
-                                                        <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
-                                                    </select>
-                                                    <button type="submit"
-                                                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">Update</button>
-                                                </form>
+                                            <button
+    type="button"
+    onclick="openRoleModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->role }}')"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm"
+>
+    Edit Role
+</button>
                                             </td>
                                         </tr>
                         @endforeach
@@ -162,6 +156,52 @@
     </div>
 @endsection
 
+<!-- Modal Background -->
+<div id="roleModal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center backdrop-blur-xs">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Update User Role</h2>
+
+        <form id="roleForm" method="POST">
+            @csrf
+            @method('POST')
+
+            <!-- Name Field -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Name:</label>
+                <p id="modalName" class="text-gray-900 mt-1 text-sm font-medium"></p>
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Email:</label>
+                <p id="modalEmail" class="text-gray-900 mt-1 text-sm font-medium"></p>
+            </div>
+
+            <!-- Role Dropdown -->
+            <div class="mb-6">
+                <label for="modalRole" class="block text-sm font-medium text-gray-700">Role:</label>
+                <select name="role" id="modalRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="user">User</option>
+                    <option value="support">Support</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-4">
+                <button type="button" onclick="closeRoleModal()"
+                    class="text-gray-700 bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 transition">Cancel</button>
+                <button type="submit"
+                    class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-2 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                    Update
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('filterForm');
@@ -181,4 +221,23 @@
             }
         });
     });
+
+    function openRoleModal(userId, name, email, role) {
+        document.getElementById('modalName').textContent = name;
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalRole').value = role;
+
+        // Update form action
+        const form = document.getElementById('roleForm');
+        form.action = `/admin/change-role/${userId}`; // adjust this if your route is different
+
+        // Show modal
+        document.getElementById('roleModal').classList.remove('hidden');
+        document.getElementById('roleModal').classList.add('flex');
+    }
+
+    function closeRoleModal() {
+        document.getElementById('roleModal').classList.add('hidden');
+        document.getElementById('roleModal').classList.remove('flex');
+    }
 </script>
