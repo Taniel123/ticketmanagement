@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin_app')
 
 @section('content')
 
@@ -6,7 +6,7 @@
 
     <!-- Main Content Area -->
     <div class="flex-1">
-    <div class="py-10 min-h-screen">
+    <div class="py-6 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-10">
 
            <!-- Dashboard Header -->    
@@ -90,100 +90,142 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Ticket Statistics -->
-<div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-semibold text-gray-800">Ticket Statistics</h2>
-        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full">Overview</span>
+<!-- Ticket Statistics Dashboard -->
+<div class="bg-white rounded-lg shadow-lg mt-5 px-5 py-3 border border-gray-200">
+  <!-- Header Section with Overview -->
+  <div class="mb-6">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-200">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">TICKET STATISTICS</h2>
+        <p class="text-sm text-gray-500 mt-1">Overview of your support ticket activity</p>
+      </div>
+      <div class="mt-4 md:mt-0 bg-gray-50 p-4 rounded-lg">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Tickets</p>
+        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $openTickets + $ongoingTickets + $closedTickets }}</p>
+      </div>
     </div>
-    <div class="relative">
-        <canvas id="ticketStatisticsChart" width="400" height="200"></canvas>
+  </div>
+
+
+
+  <!-- Chart Container -->
+  <div class="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-md font-semibold text-gray-700">Ticket Distribution</h3>
+      <div class="text-xs text-gray-500">Last updated: {{ date('M d, Y') }}</div>
     </div>
+    <div class="relative h-80">
+      <canvas id="ticketStatisticsChart" class="rounded-lg"></canvas>
+    </div>
+  </div>
 </div>
 
 <script>
-    // Data for the chart
-    const ticketData = {
-        labels: ['Open Tickets', 'Ongoing Tickets', 'Closed Tickets'],
-        datasets: [{
-            label: 'Tickets',
-            data: [{{ $openTickets }}, {{ $ongoingTickets }}, {{ $closedTickets }}],
-            backgroundColor: [
-                'rgba(99, 102, 241, 0.2)', // Open Tickets (Indigo)
-                'rgba(16, 185, 129, 0.2)', // Ongoing Tickets (Green)
-                'rgba(229, 231, 235, 0.2)' // Closed Tickets (Gray)
-            ],
-            borderColor: [
-                'rgba(99, 102, 241, 1)', // Open Tickets (Indigo)
-                'rgba(16, 185, 129, 1)', // Ongoing Tickets (Green)
-                'rgba(107, 114, 128, 1)' // Closed Tickets (Gray)
-            ],
-            borderWidth: 2,
-            borderRadius: 5, // Rounded bars
-            barPercentage: 0.6 // Adjust bar width
-        }]
-    };
+  // Data for the chart
+  const ticketData = {
+    labels: ['Open Tickets', 'Ongoing Tickets', 'Closed Tickets'],
+    datasets: [{
+      label: 'Tickets',
+      data: [{{ $openTickets }}, {{ $ongoingTickets }}, {{ $closedTickets }}],
+      backgroundColor: [
+        'rgba(79, 70, 229, 0.75)', // Open Tickets (Indigo)
+        'rgba(16, 185, 129, 0.75)', // Ongoing Tickets (Green)
+        'rgba(107, 114, 128, 0.75)' // Closed Tickets (Gray)
+      ],
+      hoverBackgroundColor: [
+        'rgba(79, 70, 229, 0.9)', // Open Tickets (Indigo)
+        'rgba(16, 185, 129, 0.9)', // Ongoing Tickets (Green)
+        'rgba(107, 114, 128, 0.9)' // Closed Tickets (Gray)
+      ],
+      borderColor: [
+        'rgba(79, 70, 229, 1)', // Open Tickets (Indigo)
+        'rgba(16, 185, 129, 1)', // Ongoing Tickets (Green)
+        'rgba(107, 114, 128, 1)' // Closed Tickets (Gray)
+      ],
+      borderWidth: 1,
+      borderRadius: 8,
+      barPercentage: 0.6
+    }]
+  };
 
-    // Configuration for the chart
-    const config = {
-        type: 'bar', // Change to 'pie' or 'doughnut' for other chart types
-        data: ticketData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false // Hide legend for a cleaner look
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(31, 41, 55, 0.9)', // Dark tooltip background
-                    titleFont: { size: 14, weight: 'bold', family: 'Inter, sans-serif' },
-                    bodyFont: { size: 12, family: 'Inter, sans-serif' },
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw}`;
-                        }
-                    }
-                }
+  // Configuration for the chart
+  const config = {
+    type: 'bar',
+    data: ticketData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            boxWidth: 12,
+            usePointStyle: true,
+            font: {
+              size: 12,
+              family: "'Inter', sans-serif",
+              weight: '500'
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false // Hide vertical grid lines
-                    },
-                    ticks: {
-                        font: {
-                            size: 12,
-                            family: 'Inter, sans-serif'
-                        },
-                        color: '#4B5563' // Gray text
-                    }
-                },
-                y: {
-                    grid: {
-                        color: '#E5E7EB' // Light gray grid lines
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        font: {
-                            size: 12,
-                            family: 'Inter, sans-serif'
-                        },
-                        color: '#4B5563' // Gray text
-                    }
-                }
+            color: '#374151'
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(17, 24, 39, 0.85)',
+          titleFont: { size: 13, weight: '600', family: "'Inter', sans-serif" },
+          bodyFont: { size: 12, family: "'Inter', sans-serif" },
+          padding: 12,
+          cornerRadius: 6,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              const percentage = Math.round((context.raw / ({{ $openTickets + $ongoingTickets + $closedTickets }}) * 100));
+              return `${context.label}: ${context.raw} (${percentage}%)`;
             }
+          }
         }
-    };
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 12,
+              family: "'Inter', sans-serif"
+            },
+            color: '#4B5563'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(243, 244, 246, 1)',
+            drawBorder: false
+          },
+          ticks: {
+            font: {
+              size: 12,
+              family: "'Inter', sans-serif"
+            },
+            color: '#4B5563',
+            precision: 0
+          }
+        }
+      }
+    }
+  };
 
-    // Render the chart
+  // Render the chart
+  document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('ticketStatisticsChart').getContext('2d');
     new Chart(ctx, config);
+  });
 </script>
-
-
+</div>
 
         </div>
     </div>

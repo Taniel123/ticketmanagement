@@ -1,16 +1,16 @@
 <!-- resources/views/dashboard/user.blade.php -->
 
-@extends('layouts.app')
+@extends('layouts.user_app')
 
 @section('content')
     <div class="py-6">
         <!-- Header Section -->
         <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <div class="h-8 w-2 bg-indigo-600 rounded-full mr-3"></div>
-                    User Dashboard
-                </h1>
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center">
+    <div class="h-8 w-2 bg-indigo-600 rounded-full mr-3"></div>
+    Welcome, {{ Auth::user()->name }}
+</h1>
             </div>
 
 
