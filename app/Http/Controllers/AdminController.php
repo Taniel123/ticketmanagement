@@ -12,13 +12,15 @@ class AdminController extends Controller
      */
 
 
-    public function pendingUsers()
-    {
+     public function pendingUsers()
+     {
+         // Fetch pending users who are not approved AND not archived
+         $pendingUsers = User::where('is_approved', false)
+                             ->where('is_archived', false)
+                             ->paginate(10);
      
-         // Fetch pending users (users who are not approved)
-    $pendingUsers = User::where('is_approved', false)->paginate(10);
-        return view('dashboard.pending-users' , compact('pendingUsers'));
-    }
+         return view('dashboard.pending-users', compact('pendingUsers'));
+     }
 public function archiveUsers()
 {
     // Fetch archived users
