@@ -185,11 +185,7 @@ class AuthController extends Controller
             ->orderBy('month')
             ->get();
     
-        // Ticket counts
-        $totalTickets = Ticket::count();
-        $openTickets = Ticket::where('status', 'open')->count();
-        $ongoingTickets = Ticket::where('status', 'ongoing')->count();
-        $closedTickets = Ticket::where('status', 'closed')->count();
+
     
         // User data
         $pendingUsers = User::where('is_approved', false)
@@ -213,11 +209,7 @@ class AuthController extends Controller
             'pendingUsers',
             'users',
             'archivedUsers',
-            'tickets',
-            'totalTickets',
-            'openTickets',
-            'ongoingTickets',
-            'closedTickets'
+            'tickets'
         ));
     }
 
