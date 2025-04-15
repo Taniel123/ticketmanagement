@@ -220,7 +220,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: true,
+                            display: false,
                             position: 'bottom',
                         },
                         tooltip: {
