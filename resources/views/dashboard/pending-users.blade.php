@@ -35,7 +35,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
+                            Registered</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions</th>
                     </tr>
@@ -45,15 +45,9 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">{{ $user->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    <span
-                                        class="h-1.5 w-1.5 mr-1.5 rounded-full {{ $user->is_approved ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
-                                    {{ $user->is_approved ? 'Approve' : 'Pending' }}
-                                </span>
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    {{ $user->created_at->format('M d, Y h:i A') }}
+</td>
                             <td class="px-6 py-4 whitespace-nowrap space-x-2">
                                 <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="inline">
                                     @csrf
