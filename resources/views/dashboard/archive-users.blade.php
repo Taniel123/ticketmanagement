@@ -9,7 +9,7 @@
             <span class="w-1 h-5 bg-gray-600 rounded mr-2"></span>
             Archived Users
         </h2>
-        <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+        <span class="bg-amber-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
             {{ $archivedUsers->total() }} archived
         </span>
     </div>
@@ -33,7 +33,7 @@
                             <form action="{{ route('users.unarchive', $user->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PUT')
-                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                     Unarchive
                                 </button>
                             </form>

@@ -6,7 +6,7 @@
         class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
             <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                <span class="w-1 h-5 bg-amber-500 rounded mr-2"></span>
+            <span class="w-1 h-5 bg-gray-600 rounded mr-2"></span>
                 Pending Users
             </h2>
             <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-medium">
@@ -45,14 +45,14 @@
                                 <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                         Approve
                                     </button>
                                 </form>
                                 <form action="{{ route('admin.archive', $user->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                         Archive
                                     </button>
                                 </form>

@@ -3,15 +3,14 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 py-2">
         <!-- Change User Roles Section -->
         <div
             class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
                     <!-- Left Title -->
-                    <h1 class="text-xl font-medium text-gray-800 flex items-center">
-                        <span class="w-1 h-8 bg-blue-500 rounded mr-2"></span>
+                    <h1 class="text-lg font-medium text-gray-800 flex items-center">
+                    <span class="w-1 h-5 bg-gray-600 rounded mr-2"></span>
                         Manage Users
                     </h1>
 
