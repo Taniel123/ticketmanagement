@@ -93,7 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/roles/manage', [AdminController::class, 'manageRoles'])->name('admin.manage-roles');
     Route::get('/tickets/manage', [AdminController::class, 'manageTickets'])->name('admin.manage-tickets');
     Route::get('/admin/archive-users', [AdminController::class, 'archiveUsers'])->name('admin.archive-users');
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    
 
         Route::post('/archive/{id}', [AuthController::class, 'archiveUser'])
             ->name('admin.archive');
