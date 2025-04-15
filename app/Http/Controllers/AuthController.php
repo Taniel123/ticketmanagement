@@ -23,7 +23,7 @@ class AuthController extends Controller
     {
         // Check if the user is already logged in
         if (session()->has('user_id')) {
-            // Redirect to the appropriate dashboard based on the user's role
+            // if the user is login ddrirect siya sa kung ano yung role niya.
             return redirect()->route(session('user_role') . '.dashboard');
         }
         return view('auth.login');
@@ -37,19 +37,21 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+            // para sa remember token 
         $credentials = $request->only('email', 'password');
         $remember = $request->boolean('remember');
 
-        // First check if the user exists
+            // First check if the user exists
         $user = User::where('email', $request->email)->first();
-        
+            
+        // check if may match na credentials
         if (!$user) {
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',
             ])->onlyInput('email');
         }
 
-        // Check if user is archived
+        // check if may naka archive yung account
         if ($user->is_archived) {
             return back()->withErrors([
                 'email' => 'This account has been archived. Please contact support.',
@@ -58,45 +60,50 @@ class AuthController extends Controller
         
         // Check credentials without logging in the user yet
         if (Auth::validate($credentials)) {
-            // Email verification check not needed if already verified
+            // check if the account email is verified
             if (!$user->hasVerifiedEmail()) {
                 return back()->withErrors([
                     'email' => 'You need to verify your email address first. Please check your email for the verification link.',
                 ])->onlyInput('email');
             }
             
-            // Check if user is approved
+            // Check if user is approved by admin
             if (!$user->is_approved) {
                 return back()->withErrors([
                     'email' => 'Your account is pending admin approval. You will be notified via email once approved.',
                 ])->onlyInput('email');
             }
-            
+
+            //redirect the account base on the role
             Auth::login($user, $remember);
             return redirect()->route($user->role . '.dashboard');
         }
-
+            //Redirects the user back to the previous page
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
     }
 
-    // Show registration form
+    // Show registration form / registration route
     public function showRegister()
     {
         return view('auth.register');
     }
 
     // Handle registration logic
+  
     public function register(Request $request)
     {
+        
+    //input validation - Checks name, email, and password validity.
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8|confirmed',
             ]);
-
+            
+              //Transaction start- initializes the transaction by starting a transactional block.
             DB::beginTransaction();
 
             $user = User::create([
@@ -115,6 +122,7 @@ class AuthController extends Controller
             // Send verification email
             event(new Registered($user));
 
+            //operations are successful.
             DB::commit();
 
             // Redirect to login with success message
@@ -134,12 +142,13 @@ class AuthController extends Controller
     {
         Auth::logout();
         $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
+        $request->session()->regenerateToken(); // Regenerates the CSRF token
+        //redirect sa login
         return redirect()->route('login');
     }
 
     // Show user dashboard
+    //user dashboard route
     public function showUserDashboard()
     {
         if (auth()->user()->role !== 'user') {
@@ -148,27 +157,29 @@ class AuthController extends Controller
         
         $user = Auth::user();
         $tickets = $user->tickets()->latest()->paginate(3);
-        return view('dashboard.user', compact('tickets'));
+        return view('dashboard.user', compact('tickets')); //gets the tickets
     }
 
     // Show admin dashboard
     public function showAdminDashboard()
-    {
+    {   
+        // Check if the user is an admin
         if (auth()->user()->role !== 'admin') {
             abort(403);
         }
-        
+
+            //users na hindi pa approve and archive
         $pendingUsers = User::where('is_approved', false)
-                           ->where('is_archived', false)
-                           ->paginate(3, ['*'], 'pending_page');
-                           
+                        ->where('is_archived', false)
+                        ->paginate(3, ['*'], 'pending_page');
+             //users na approve and direct sa user page
         $users = User::where('is_approved', true)
-                     ->where('is_archived', false)
-                     ->paginate(3, ['*'], 'users_page');
-                     
+                    ->where('is_archived', false)
+                    ->paginate(3, ['*'], 'users_page');
+              //archived users         
         $archivedUsers = User::where('is_archived', true)
                             ->paginate(3, ['*'], 'archived_page');
-                            
+            // Get tickets with user information
         $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
         
         return view('dashboard.admin', compact('pendingUsers', 'users', 'archivedUsers', 'tickets'));
@@ -176,11 +187,12 @@ class AuthController extends Controller
 
     // Show support dashboard
     public function showSupportDashboard()
-    {
+
+    {       //check if support
         if (auth()->user()->role !== 'support') {
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
-        
+            //get ticket with status open or ongoing
         $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->paginate(3);
         return view('dashboard.support', compact('tickets'));
     }
@@ -188,28 +200,27 @@ class AuthController extends Controller
     // Approve User
     public function approveUser($id)
     {
-        $user = User::findOrFail($id);
-        $user->update(['is_approved' => true]);
+        $user = User::findOrFail($id); //find user via id
+        $user->update(['is_approved' => true]); //update if approved
         
         // Send approval notification
-        $user->notify(new UserApprovedNotification());
+        $user->notify(new UserApprovedNotification()); // email notificatiion
         
         return back()->with('success', 'User approved successfully. An email notification has been sent.');
     }
 
-    // Delete User
-    public function deleteUser($id)
-    {
-        // Find the user by ID
-        $user = User::findOrFail($id);
+        // for delete user
+    // public function deleteUser($id)
+    // {
+    //     $user = User::findOrFail($id);
 
-        // Delete the user from the database
-        $user->delete();
+    //     $user->delete();
 
-        // Redirect back to admin dashboard with success message
-        return redirect()->route('admin.dashboard')->with('success', 'User deleted successfully.');
-    }
+    //     return redirect()->route('admin.dashboard')->with('success', 'User deleted successfully.');
+    // }
 
+
+        //accept incoming request sa new role
     public function changeUserRole(Request $request, $id)
     {
         try {
@@ -242,8 +253,8 @@ class AuthController extends Controller
             ]);
 
             if ($result) {
-                // Send notification to user
-                $user->notify(new UserArchivedNotification());
+                // Send notification to admin 
+                auth()->user()->notify(new UserArchivedNotification($user));
                 return redirect()->back()->with('success', 'User has been archived successfully');
             }
             
@@ -262,8 +273,8 @@ class AuthController extends Controller
             ]);
 
             if ($result) {
-                // Send notification to user
-                $user->notify(new UserUnarchiveNotification());
+                // Send notification to admin instead of user
+                auth()->user()->notify(new UserUnarchiveNotification($user));
                 return redirect()->back()->with('success', 'User unarchived successfully');
             }
 
