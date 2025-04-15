@@ -209,11 +209,7 @@ class AuthController extends Controller
             'pendingUsers',
             'users',
             'archivedUsers',
-            'tickets',
-            'totalTickets',
-            'openTickets',
-            'ongoingTickets',
-            'closedTickets'
+            'tickets'
         ));
     }
 
