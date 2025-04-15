@@ -45,14 +45,14 @@
                                 <form action="{{ route('admin.approve', $user->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                         Approve
                                     </button>
                                 </form>
                                 <form action="{{ route('admin.archive', $user->id) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit"
-                                        class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                         Archive
                                     </button>
                                 </form>

@@ -155,31 +155,62 @@ class AuthController extends Controller
         if (auth()->user()->role !== 'admin') {
             abort(403);
         }
-
-    $totalTickets = Ticket::count();
-    $openTickets = Ticket::where('status', 'open')->count();
-    $ongoingTickets = Ticket::where('status', 'ongoing')->count();
-    $closedTickets = Ticket::where('status', 'closed')->count();
-
-        // $pendingUsers = User::where('is_approved', false)->paginate(3);
-        // $users = User::where('is_approved', true)->paginate(3);
-        // $tickets = Ticket::with('user')->latest()->paginate(3);
-        
+    
+        // Daily tickets: last 7 days
+        $dailyTickets = Ticket::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+    
+        // Weekly tickets: last 8 weeks
+        $weeklyTickets = Ticket::selectRaw('YEARWEEK(created_at, 1) as yearweek, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subWeeks(8))
+            ->groupBy('yearweek')
+            ->orderBy('yearweek')
+            ->get();
+    
+        // Monthly tickets: last 12 months
+        $monthlyTickets = Ticket::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subMonths(12))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+        // Ticket counts
+        $totalTickets = Ticket::count();
+        $openTickets = Ticket::where('status', 'open')->count();
+        $ongoingTickets = Ticket::where('status', 'ongoing')->count();
+        $closedTickets = Ticket::where('status', 'closed')->count();
+    
+        // User data
         $pendingUsers = User::where('is_approved', false)
-                           ->where('is_archived', false)
-                           ->paginate(3, ['*'], 'pending_page');
-                           
+            ->where('is_archived', false)
+            ->paginate(3, ['*'], 'pending_page');
+    
         $users = User::where('is_approved', true)
-                     ->where('is_archived', false)
-                     ->paginate(3, ['*'], 'users_page');
-                     
+            ->where('is_archived', false)
+            ->paginate(3, ['*'], 'users_page');
+    
         $archivedUsers = User::where('is_archived', true)
-                            ->paginate(3, ['*'], 'archived_page');
-                            
+            ->paginate(3, ['*'], 'archived_page');
+    
         $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
-        
-        return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets', 'archivedUsers', 'totalTickets', 'openTickets', 'ongoingTickets', 'closedTickets'));
-
+    
+        // Consolidated return statement
+        return view('dashboard.admin', compact(
+            'dailyTickets',
+            'weeklyTickets',
+            'monthlyTickets',
+            'pendingUsers',
+            'users',
+            'archivedUsers',
+            'tickets',
+            'totalTickets',
+            'openTickets',
+            'ongoingTickets',
+            'closedTickets'
+        ));
     }
 
     // Show support dashboard
