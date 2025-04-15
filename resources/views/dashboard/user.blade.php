@@ -45,7 +45,7 @@
                 </span>
             </div>
 
-            <div class="p-6">
+            <div class="px-6 pt-6">
                 @if($tickets->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($tickets as $ticket)
@@ -92,41 +92,7 @@
                         @endforeach
                     </div>
 
-                    <div class="mt-10">
-                        <div class="flex justify-end">
-                            <div class="inline-flex items-center space-x-1">
-                                {{-- Previous Page Link --}}
-                                @if ($tickets->onFirstPage())
-                                    <span
-                                        class="px-3 py-1 text-xs text-gray-500 cursor-not-allowed bg-gray-100 rounded-md border border-gray-300">Previous</span>
-                                @else
-                                    <a href="{{ $tickets->previousPageUrl() }}"
-                                        class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">Previous</a>
-                                @endif
-
-                                {{-- Pagination Links --}}
-                                @foreach ($tickets->getUrlRange(1, $tickets->lastPage()) as $page => $url)
-                                    @if ($page == $tickets->currentPage())
-                                        <span
-                                            class="px-3 py-1 text-xs text-white bg-indigo-600 border border-indigo-600 rounded-md">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}"
-                                            class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                {{-- Next Page Link --}}
-                                @if ($tickets->hasMorePages())
-                                    <a href="{{ $tickets->nextPageUrl() }}"
-                                        class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">Next</a>
-                                @else
-                                    <span
-                                        class="px-3 py-1 text-xs text-gray-500 cursor-not-allowed bg-gray-100 border border-gray-300 rounded-md">Next</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
+              
                 @else
                     <div class="py-10 text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none"
@@ -139,6 +105,45 @@
                     </div>
                 @endif
             </div>
+
+            <div class="mt-5 p-5 bg-gray-50 border-t border-gray-200">
+    <div class="flex justify-between items-center">
+        <div class="text-sm text-gray-500">
+            Showing {{ $tickets->firstItem() }}–{{ $tickets->lastItem() }} of {{ $tickets->total() }} ticket(s)
+        </div>
+        <div class="inline-flex items-center space-x-1">
+            {{-- Previous Page Link --}}
+            @if ($tickets->onFirstPage())
+                <span
+                    class="px-3 py-1 text-xs text-gray-500 cursor-not-allowed bg-gray-100 rounded-md border border-gray-300">Previous</span>
+            @else
+                <a href="{{ $tickets->previousPageUrl() }}"
+                    class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">Previous</a>
+            @endif
+
+            {{-- Pagination Links --}}
+            @foreach ($tickets->getUrlRange(1, $tickets->lastPage()) as $page => $url)
+                @if ($page == $tickets->currentPage())
+                    <span
+                        class="px-3 py-1 text-xs text-white bg-indigo-600 border border-indigo-600 rounded-md">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}"
+                        class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($tickets->hasMorePages())
+                <a href="{{ $tickets->nextPageUrl() }}"
+                    class="px-3 py-1 text-xs text-indigo-600 hover:bg-indigo-100 border border-indigo-600 rounded-md">Next</a>
+            @else
+                <span
+                    class="px-3 py-1 text-xs text-gray-500 cursor-not-allowed bg-gray-100 border border-gray-300 rounded-md">Next</span>
+            @endif
+        </div>
+    </div>
+</div>
+            
         </div>
     </div>
 @endsection
