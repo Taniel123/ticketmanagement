@@ -55,17 +55,17 @@
                         <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">{{ $ticket->title }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $ticket->user->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ticket->status === 'open' ? 'bg-green-100 text-green-800' : ($ticket->status === 'ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
-                                <span class="h-1.5 w-1.5 mr-1.5 rounded-full {{ $ticket->status === 'open' ? 'bg-green-600' : ($ticket->status === 'ongoing' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
-                                {{ ucfirst($ticket->status) }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ticket->priority === 'High' ? 'bg-red-100 text-red-800' : ($ticket->priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
-                                <span class="h-1.5 w-1.5 mr-1.5 rounded-full {{ $ticket->priority === 'High' ? 'bg-red-600' : ($ticket->priority === 'Medium' ? 'bg-yellow-600' : 'bg-green-600') }}"></span>
-                                {{ ucfirst($ticket->priority) }}
-                            </span>
-                        </td>
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ticket->status === 'Open' ? 'bg-amber-100 text-amber-800' : ($ticket->status === 'Ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+        <span class="h-1.5 w-1.5 mr-1.5 rounded-full {{ $ticket->status === 'Open' ? 'bg-amber-600' : ($ticket->status === 'Ongoing' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
+        {{ ucfirst($ticket->status) }}
+    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ticket->priority === 'High' ? 'bg-red-100 text-red-800' : ($ticket->priority === 'Medium' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800') }}">
+        <span class="h-1.5 w-1.5 mr-1.5 rounded-full {{ $ticket->priority === 'High' ? 'bg-red-600' : ($ticket->priority === 'Medium' ? 'bg-amber-600' : 'bg-green-600') }}"></span>
+        {{ ucfirst($ticket->priority) }}
+    </span>
+</td>
                         <td class="px-6 py-4 whitespace-nowrap space-x-2">
                             <div class="flex items-center space-x-3">
                             <a href="{{ route('tickets.show', $ticket) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">View</a>

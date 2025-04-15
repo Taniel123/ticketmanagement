@@ -10,7 +10,7 @@
             Archived Users
         </h2>
         <span class="bg-amber-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {{ $archivedUsers->total() }} archived
+            {{ $archivedUsers->total() }} archived users
         </span>
     </div>
     <div class="overflow-x-auto">
@@ -26,9 +26,19 @@
             <tbody class="bg-white divide-y divide-gray-100">
                 @forelse ($archivedUsers as $user)
                     <tr class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap font-semibold">{{ $user->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($user->role) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+    <span
+        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+            {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : ($user->role === 'support' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+        <span
+            class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                {{ $user->role === 'admin' ? 'bg-purple-600' : ($user->role === 'support' ? 'bg-blue-600' : 'bg-gray-600') }}">
+        </span>
+        {{ ucfirst($user->role) }}
+    </span>
+</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <form action="{{ route('users.unarchive', $user->id) }}" method="POST" class="inline">
                                 @csrf
