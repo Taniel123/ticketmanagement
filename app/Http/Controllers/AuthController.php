@@ -214,15 +214,34 @@ class AuthController extends Controller
     }
 
     // Show support dashboard
-    public function showSupportDashboard()
-    {
-        if (auth()->user()->role !== 'support') {
-            return redirect()->route(auth()->user()->role . '.dashboard');
-        }
-
-        $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->paginate(3);
-        return view('dashboard.support', compact('tickets'));
+    public function showSupportDashboard(Request $request)
+{
+    if (auth()->user()->role !== 'support') {
+        return redirect()->route(auth()->user()->role . '.dashboard');
     }
+
+    $query = Ticket::whereIn('status', ['open', 'ongoing'])->latest();
+
+    // Apply search filter if there's a search term
+    if ($request->has('search') && $request->search != '') {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    }
+
+    // Apply status filter if selected
+    if ($request->has('status') && $request->status != '') {
+        $query->where('status', $request->status);
+    }
+
+    // Apply priority filter if selected
+    if ($request->has('priority') && $request->priority != '') {
+        $query->where('priority', $request->priority);
+    }
+
+    // Paginate results
+    $tickets = $query->paginate(10);
+
+    return view('dashboard.support', compact('tickets'));
+}
 
     // Approve User
     public function approveUser($id)

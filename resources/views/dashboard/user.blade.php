@@ -50,7 +50,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($tickets as $ticket)
                                 <div
-                                    class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+                                    class="bg-gray border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
                                     <div class="border-l-4 
                                                 {{ $ticket->status == 'open' ? 'border-green-500' :
                             ($ticket->status == 'in_progress' ? 'border-blue-500' : 'border-gray-400') }}">
@@ -93,7 +93,7 @@
                     </div>
 
                     <div class="mt-10">
-                        <div class="flex justify-center">
+                        <div class="flex justify-end">
                             <div class="inline-flex items-center space-x-1">
                                 {{-- Previous Page Link --}}
                                 @if ($tickets->onFirstPage())

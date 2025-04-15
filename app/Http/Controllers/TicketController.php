@@ -96,34 +96,56 @@ class TicketController extends Controller
 
     // Update ticket status (admin and support only)
     public function updateStatus(Request $request, Ticket $ticket)
-    {
-        try {
-            // Validate request
-            $request->validate([
-                'status' => 'required|in:Open,Ongoing,Closed'
+{
+    try {
+        // Validate request
+        $request->validate([
+            'status' => 'required|in:Open,Ongoing,Closed'
+        ]);
+
+        // Store old status
+        $oldStatus = $ticket->status;
+
+        // Update ticket status
+        $ticket->update([
+            'status' => $request->status
+        ]);
+
+        // Notify the ticket owner (optional)
+        $ticket->user->notify(new TicketUpdateNotification(
+            $ticket,
+            auth()->user(),
+            $oldStatus,
+            $request->status
+        ));
+
+        // Check if the request is AJAX (for modal)
+        if ($request->ajax()) {
+            // Return the updated ticket data for modal refresh
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket status updated successfully.',
+                'ticket' => $ticket
             ]);
-
-            // Store old status
-            $oldStatus = $ticket->status;
-
-            // Update ticket status
-            $ticket->update([
-                'status' => $request->status
-            ]);
-
-            // Notify the ticket owner
-            $ticket->user->notify(new TicketUpdateNotification(
-                $ticket,
-                auth()->user(),
-                $oldStatus,
-                $request->status
-            ));
-
-            return back()->with('success', 'Ticket status updated successfully.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
         }
+
+        // If not an AJAX request, return back to the previous page
+        return back()->with('success', 'Ticket status updated successfully.');
+    } catch (\Exception $e) {
+        // Check if the request is AJAX (for modal)
+        if ($request->ajax()) {
+            // Return error message in case of AJAX request
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update ticket status: ' . $e->getMessage()
+            ]);
+        }
+
+        // If not AJAX, return back with error
+        return back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
     }
+}
+
 
     // Update ticket
     public function update(Request $request, Ticket $ticket)
