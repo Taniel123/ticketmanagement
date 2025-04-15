@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         // First check if the user exists
         $user = User::where('email', $request->email)->first();
-        
+
         if (!$user) {
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',
@@ -53,7 +53,13 @@ class AuthController extends Controller
                 'email' => 'This account has been archived. Please contact support.',
             ])->onlyInput('email');
         }
-        
+
+        if ($user->status !== 1) { // Only allow if status is 1 (active)
+            return back()->withErrors([
+                'email' => 'Your account is inactive. Please contact support.',
+            ])->onlyInput('email');
+        }
+
         // Check credentials without logging in the user yet
         if (Auth::validate($credentials)) {
             // Email verification check not needed if already verified
@@ -62,14 +68,14 @@ class AuthController extends Controller
                     'email' => 'You need to verify your email address first. Please check your email for the verification link.',
                 ])->onlyInput('email');
             }
-            
+
             // Check if user is approved
             if (!$user->is_approved) {
                 return back()->withErrors([
                     'email' => 'Your account is pending admin approval. You will be notified via email once approved.',
                 ])->onlyInput('email');
             }
-            
+
             Auth::login($user, $remember);
             return redirect()->route($user->role . '.dashboard');
         }
@@ -133,7 +139,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('login');
     }
 
@@ -143,7 +149,7 @@ class AuthController extends Controller
         if (auth()->user()->role !== 'user') {
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
-        
+
         $user = Auth::user();
         $tickets = $user->tickets()->latest()->paginate(3);
         return view('dashboard.user', compact('tickets'));
@@ -156,28 +162,28 @@ class AuthController extends Controller
             abort(403);
         }
 
-    $totalTickets = Ticket::count();
-    $openTickets = Ticket::where('status', 'open')->count();
-    $ongoingTickets = Ticket::where('status', 'ongoing')->count();
-    $closedTickets = Ticket::where('status', 'closed')->count();
+        $totalTickets = Ticket::count();
+        $openTickets = Ticket::where('status', 'open')->count();
+        $ongoingTickets = Ticket::where('status', 'ongoing')->count();
+        $closedTickets = Ticket::where('status', 'closed')->count();
 
         // $pendingUsers = User::where('is_approved', false)->paginate(3);
         // $users = User::where('is_approved', true)->paginate(3);
         // $tickets = Ticket::with('user')->latest()->paginate(3);
-        
+
         $pendingUsers = User::where('is_approved', false)
-                           ->where('is_archived', false)
-                           ->paginate(3, ['*'], 'pending_page');
-                           
+            ->where('is_archived', false)
+            ->paginate(3, ['*'], 'pending_page');
+
         $users = User::where('is_approved', true)
-                     ->where('is_archived', false)
-                     ->paginate(3, ['*'], 'users_page');
-                     
+            ->where('is_archived', false)
+            ->paginate(3, ['*'], 'users_page');
+
         $archivedUsers = User::where('is_archived', true)
-                            ->paginate(3, ['*'], 'archived_page');
-                            
+            ->paginate(3, ['*'], 'archived_page');
+
         $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
-        
+
         return view('dashboard.admin', compact('pendingUsers', 'users', 'tickets', 'archivedUsers', 'totalTickets', 'openTickets', 'ongoingTickets', 'closedTickets'));
 
     }
@@ -188,7 +194,7 @@ class AuthController extends Controller
         if (auth()->user()->role !== 'support') {
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
-        
+
         $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->paginate(3);
         return view('dashboard.support', compact('tickets'));
     }
@@ -198,10 +204,10 @@ class AuthController extends Controller
     {
         $user = User::findOrFail($id);
         $user->update(['is_approved' => true]);
-        
+
         // Send approval notification
         $user->notify(new UserApprovedNotification());
-        
+
         return back()->with('success', 'User approved successfully. An email notification has been sent.');
     }
 
@@ -223,13 +229,16 @@ class AuthController extends Controller
         try {
             $user = User::findOrFail($id);
             $oldRole = $user->role;
-            
+
             // Update the role
-            $user->update(['role' => $request->role]);
-            
+            $user->update([
+                'role' => $request->role,
+                'status' => (int)$request->status,
+            ]);
+
             // Send notification using the new RoleChangeNotification
             $user->notify(new RoleChangeNotification($request->role, auth()->user()));
-            
+
             return back()->with('success', 'User role updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to update user role: ' . $e->getMessage());
@@ -240,11 +249,11 @@ class AuthController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            
+
             if ($user->role === 'admin') {
                 return redirect()->back()->with('error', 'Cannot archive an admin user');
             }
-            
+
             $result = $user->update([
                 'is_archived' => true
             ]);
@@ -252,7 +261,7 @@ class AuthController extends Controller
             if ($result) {
                 return redirect()->back()->with('success', 'User has been archived successfully');
             }
-            
+
             return redirect()->back()->with('error', 'Failed to archive user');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to archive user: ' . $e->getMessage());
@@ -269,4 +278,28 @@ class AuthController extends Controller
             return redirect()->back()->with('error', 'Failed to unarchive user');
         }
     }
+
+    public function updateUserStatus(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            if ($user->role === 'admin') {
+                return back()->with('error', 'Cannot change status of an admin user.');
+            }
+
+            $request->validate([
+                'status' => 'required|in:active,inactive',
+            ]);
+
+            $user->update([
+                'status' => $request->status, // should be 'active' or 'inactive'
+            ]);
+
+            return back()->with('success', 'User status updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to update user status: ' . $e->getMessage());
+        }
+    }
 }
+

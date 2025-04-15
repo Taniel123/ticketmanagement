@@ -44,8 +44,10 @@ public function archiveUsers()
     }
 
     if ($request->filled('status')) {
-        $query->where('is_approved', $request->status);
+        // If the status is 'active', filter by 1 (true), otherwise by 0 (false)
+        $query->where('status', $request->status == 'active' ? 1 : 0);
     }
+    
 
     $users = $query->paginate(10);
 

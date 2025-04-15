@@ -28,12 +28,12 @@
                         </select>
 
                         <!-- Status Dropdown -->
-                        <select name="status"
-                            class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">All Statuses</option>
-                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Pending</option>
-                        </select>
+<select name="status"
+    class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500">
+    <option value="">All Statuses</option>
+    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+</select>
 
                         <!-- Search Input -->
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name..."
@@ -66,32 +66,28 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->email }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                                            {{ $user->role == 'admin' ? 'bg-purple-100 text-purple-800' :
+                                                                                                                {{ $user->role == 'admin' ? 'bg-purple-100 text-purple-800' :
                             ($user->role == 'support' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
                                                     <span class="h-1.5 w-1.5 mr-1.5 rounded-full
-                                                                                                {{ $user->role == 'admin' ? 'bg-purple-600' :
+                                                                                                                    {{ $user->role == 'admin' ? 'bg-purple-600' :
                             ($user->role == 'support' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
                                                     {{ ucfirst($user->role) }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                                            {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                    <span
-                                                        class="h-1.5 w-1.5 mr-1.5 rounded-full 
-                                                                                                {{ $user->is_approved ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
-                                                    {{ $user->is_approved ? 'Active' : 'Pending' }}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {{ $user->status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                    <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                {{ $user->status ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
+                                                    {{ $user->status ? 'Active' : 'Inactive' }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                            <button
-    type="button"
-    onclick="openRoleModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->role }}')"
-    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm"
->
-    Edit
-</button>
+                                                <button type="button"
+                                                    onclick="openRoleModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->role }}', '{{ $user->status }}')"
+                                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
+                                                    Edit
+                                                </button>
                                             </td>
                                         </tr>
                         @endforeach
@@ -181,10 +177,20 @@
             <!-- Role Dropdown -->
             <div class="mb-6">
                 <label for="modalRole" class="block text-sm font-medium text-gray-700">Role:</label>
-                <select name="role" id="modalRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <select name="role" id="modalRole"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     <option value="user">User</option>
                     <option value="support">Support</option>
                     <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label for="modalStatus" class="block text-sm font-medium text-gray-700">Status:</label>
+                <select name="status" id="modalStatus"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
                 </select>
             </div>
 
@@ -203,43 +209,44 @@
 
 
 @section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('filterForm');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('filterForm');
 
-        // Auto-submit on dropdown change
-        form.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', () => {
-                form.submit();
+            // Auto-submit on dropdown change
+            form.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', () => {
+                    form.submit();
+                });
+            });
+
+            // Auto-submit on typing in search (on Enter key)
+            const searchInput = form.querySelector('input[name="search"]');
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    form.submit();
+                }
             });
         });
 
-        // Auto-submit on typing in search (on Enter key)
-        const searchInput = form.querySelector('input[name="search"]');
-        searchInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                form.submit();
-            }
-        });
-    });
+        function openRoleModal(userId, name, email, role, status) {
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalEmail').textContent = email;
+            document.getElementById('modalRole').value = role;
+            document.getElementById('modalStatus').value = status;
 
-    function openRoleModal(userId, name, email, role) {
-        document.getElementById('modalName').textContent = name;
-        document.getElementById('modalEmail').textContent = email;
-        document.getElementById('modalRole').value = role;
+            // Update form action
+            const form = document.getElementById('roleForm');
+            form.action = `/admin/change-role/${userId}`; // adjust this if your route is different
 
-        // Update form action
-        const form = document.getElementById('roleForm');
-        form.action = `/admin/change-role/${userId}`; // adjust this if your route is different
+            // Show modal
+            document.getElementById('roleModal').classList.remove('hidden');
+            document.getElementById('roleModal').classList.add('flex');
+        }
 
-        // Show modal
-        document.getElementById('roleModal').classList.remove('hidden');
-        document.getElementById('roleModal').classList.add('flex');
-    }
-
-    function closeRoleModal() {
-        document.getElementById('roleModal').classList.add('hidden');
-        document.getElementById('roleModal').classList.remove('flex');
-    }
-</script>
+        function closeRoleModal() {
+            document.getElementById('roleModal').classList.add('hidden');
+            document.getElementById('roleModal').classList.remove('flex');
+        }
+    </script>
 @endsection
