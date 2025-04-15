@@ -13,6 +13,8 @@ use Illuminate\Auth\Events\Registered;
 use App\Notifications\TicketNotification;
 use App\Notifications\UserApprovedNotification;
 use App\Notifications\RoleChangeNotification;
+use App\Notifications\UserArchivedNotification;
+use App\Notifications\UserUnarchiveNotification;
 
 class AuthController extends Controller
 {
@@ -240,6 +242,8 @@ class AuthController extends Controller
             ]);
 
             if ($result) {
+                // Send notification to user
+                $user->notify(new UserArchivedNotification());
                 return redirect()->back()->with('success', 'User has been archived successfully');
             }
             
@@ -253,10 +257,19 @@ class AuthController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $user->update(['is_archived' => false]);
-            return redirect()->back()->with('success', 'User unarchived successfully');
-        } catch (\Exception $e) {
+            $result = $user->update([
+                'is_archived' => false
+            ]);
+
+            if ($result) {
+                // Send notification to user
+                $user->notify(new UserUnarchiveNotification());
+                return redirect()->back()->with('success', 'User unarchived successfully');
+            }
+
             return redirect()->back()->with('error', 'Failed to unarchive user');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to unarchive user: ' . $e->getMessage());
         }
     }
 }
