@@ -33,7 +33,9 @@ public function archiveUsers()
      */
     public function manageRoles(Request $request)
 {
-    $query = User::query();
+    $query = User::query()
+        ->where('is_approved', true)
+        ->where('is_archived', false); // Exclude archived users too
 
     if ($request->filled('search')) {
         $query->where('name', 'like', '%' . $request->search . '%');

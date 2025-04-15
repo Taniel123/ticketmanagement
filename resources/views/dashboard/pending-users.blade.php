@@ -63,7 +63,7 @@
                                     </button>
                                 </form>
                                 <form action="{{ route('admin.archive', $user->id) }}" method="POST" class="inline">
-                                    @csrf
+                                    @csrf   
                                     <button type="submit"
                                         class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
                                         Archive
