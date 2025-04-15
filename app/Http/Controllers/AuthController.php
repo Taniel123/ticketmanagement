@@ -301,21 +301,21 @@ class AuthController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-
+            
             if ($user->role === 'admin') {
                 return redirect()->back()->with('error', 'Cannot archive an admin user');
             }
-
+            
             $result = $user->update([
                 'is_archived' => true
             ]);
 
             if ($result) {
-                // Send notification to user
-                $user->notify(new UserArchivedNotification());
+                // Send notification to admin 
+                auth()->user()->notify(new UserArchivedNotification($user));
                 return redirect()->back()->with('success', 'User has been archived successfully');
             }
-
+            
             return redirect()->back()->with('error', 'Failed to archive user');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to archive user: ' . $e->getMessage());
@@ -331,8 +331,8 @@ class AuthController extends Controller
             ]);
 
             if ($result) {
-                // Send notification to user
-                $user->notify(new UserUnarchiveNotification());
+                // Send notification to admin instead of user
+                auth()->user()->notify(new UserUnarchiveNotification($user));
                 return redirect()->back()->with('success', 'User unarchived successfully');
             }
 
@@ -341,7 +341,6 @@ class AuthController extends Controller
             return redirect()->back()->with('error', 'Failed to unarchive user: ' . $e->getMessage());
         }
     }
-
     public function updateUserStatus(Request $request, $id)
     {
         try {
