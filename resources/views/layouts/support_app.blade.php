@@ -63,7 +63,7 @@
 
         <div class="flex flex-1">
         <aside id="sidebar"
-    class="w-64 bg-white text-gray-800 transition-all duration-300 transform lg:translate-x-0 -translate-x-full lg:static fixed z-30 min-h-screen shadow-md flex flex-col">
+        class="w-64 h-screen fixed top-16 left-0 z-30 bg-white text-gray-800 shadow-md flex flex-col overflow-y-auto">
     <div class="h-full flex flex-col">
         <div class="px-4 py-5 bg-indigo-50 border-b border-gray-200">
             <div class="flex items-center">
@@ -119,7 +119,7 @@
     </div>
 </aside>
             <!-- Main Content -->
-            <main class="flex-1 overflow-auto focus:outline-none bg-gray-50">
+            <main class="flex-1 overflow-auto focus:outline-none bg-gray-50 lg:ml-64">
                 <div class="py-6 px-4 sm:px-6 lg:px-8">
                    
                     
