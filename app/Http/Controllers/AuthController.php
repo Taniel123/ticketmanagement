@@ -13,8 +13,8 @@ use Illuminate\Auth\Events\Registered;
 use App\Notifications\TicketNotification;
 use App\Notifications\UserApprovedNotification;
 use App\Notifications\RoleChangeNotification;
-use App\Notifications\UserArchivedNotification;
-use App\Notifications\UserUnarchiveNotification;
+// use App\Notifications\UserArchivedNotification;
+// use App\Notifications\UserUnarchiveNotification;
 
 class AuthController extends Controller
 {
@@ -149,52 +149,116 @@ class AuthController extends Controller
 
     // Show user dashboard
     //user dashboard route
-    public function showUserDashboard()
+    public function showUserDashboard(Request $request)
     {
-        if (auth()->user()->role !== 'user') {
-            return redirect()->route(auth()->user()->role . '.dashboard');
+        $user = Auth::user();
+        $status = $request->get('status', 'open');
+        
+        // Start with base query
+        $query = $user->tickets();
+        
+        // Apply status filter if not 'all'
+        if ($status !== 'all') {
+            $query->where('status', $status);
         }
         
-        $user = Auth::user();
-        $tickets = $user->tickets()->latest()->paginate(3);
-        return view('dashboard.user', compact('tickets')); //gets the tickets
+        // Get filtered tickets
+        $tickets = $query->latest()->paginate(6);
+        
+        // Get counts for each status
+        $allCount = $user->tickets()->count();
+        $openCount = $user->tickets()->where('status', 'open')->count();
+        $ongoingCount = $user->tickets()->where('status', 'ongoing')->count();
+        $closedCount = $user->tickets()->where('status', 'closed')->count();
+        
+        return view('dashboard.user', compact(
+            'tickets',
+            'status',
+            'allCount',
+            'openCount',
+            'ongoingCount',
+            'closedCount'
+        ));
     }
 
     // Show admin dashboard
-    public function showAdminDashboard()
+    public function showAdminDashboard(Request $request)
     {   
-        // Check if the user is an admin
         if (auth()->user()->role !== 'admin') {
             abort(403);
         }
 
-            //users na hindi pa approve and archive
-        $pendingUsers = User::where('is_approved', false)
-                        ->where('is_archived', false)
-                        ->paginate(3, ['*'], 'pending_page');
-             //users na approve and direct sa user page
-        $users = User::where('is_approved', true)
-                    ->where('is_archived', false)
-                    ->paginate(3, ['*'], 'users_page');
-              //archived users         
-        $archivedUsers = User::where('is_archived', true)
-                            ->paginate(3, ['*'], 'archived_page');
-            // Get tickets with user information
-        $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
+        // Get the status filter
+        $status = $request->get('status', 'open');
         
-        return view('dashboard.admin', compact('pendingUsers', 'users', 'archivedUsers', 'tickets'));
+        // Get pending users
+        $pendingUsers = User::where('is_approved', false)
+                        ->paginate(3, ['*'], 'pending_page');
+        
+        // Get approved users
+        $users = User::where('is_approved', true)
+                    ->paginate(3, ['*'], 'users_page');
+        
+        // Start with base query
+        $query = Ticket::with('user');
+        
+        // Apply status filter if not 'all'
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+        
+        // Get filtered tickets
+        $tickets = $query->latest()->paginate(3, ['*'], 'tickets_page');
+        
+        // Get counts for each status
+        $openCount = Ticket::where('status', 'open')->count();
+        $ongoingCount = Ticket::where('status', 'ongoing')->count();
+        $closedCount = Ticket::where('status', 'closed')->count();
+        
+        return view('dashboard.admin', compact(
+            'pendingUsers',
+            'users',
+            'tickets',
+            'status',
+            'openCount',
+            'ongoingCount',
+            'closedCount'
+        ));
     }
 
     // Show support dashboard
-    public function showSupportDashboard()
-
-    {       //check if support
+    public function showSupportDashboard(Request $request)
+    {
         if (auth()->user()->role !== 'support') {
             return redirect()->route(auth()->user()->role . '.dashboard');
         }
-            //get ticket with status open or ongoing
-        $tickets = Ticket::whereIn('status', ['open', 'ongoing'])->latest()->paginate(3);
-        return view('dashboard.support', compact('tickets'));
+        
+        // Get the filter from request, default to open tickets
+        $status = $request->get('status', 'open');
+        
+        // Start with base query
+        $query = Ticket::query()->with('user')->latest();
+        
+        // Apply status filter if not 'all'
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+        
+        // Get tickets based on filter
+        $tickets = $query->paginate(10)->withQueryString();
+        
+        // Get counts for each status
+        $openCount = Ticket::where('status', 'open')->count();
+        $ongoingCount = Ticket::where('status', 'ongoing')->count();
+        $closedCount = Ticket::where('status', 'closed')->count();
+        
+        return view('dashboard.support', compact(
+            'tickets', 
+            'status',
+            'openCount',
+            'ongoingCount',
+            'closedCount'
+        ));
     }
 
     // Approve User
@@ -239,48 +303,75 @@ class AuthController extends Controller
         }
     }
 
-    public function archiveUser($id)
-    {
-        try {
-            $user = User::findOrFail($id);
+    // public function archiveUser($id)
+    // {
+    //     try {
+    //         $user = User::findOrFail($id);
             
-            if ($user->role === 'admin') {
-                return redirect()->back()->with('error', 'Cannot archive an admin user');
-            }
+    //         if ($user->role === 'admin') {
+    //             return redirect()->back()->with('error', 'Cannot archive an admin user');
+    //         }
             
-            $result = $user->update([
-                'is_archived' => true
-            ]);
+    //         $result = $user->update([
+    //             'is_archived' => true
+    //         ]);
 
-            if ($result) {
-                // Send notification to admin 
-                auth()->user()->notify(new UserArchivedNotification($user));
-                return redirect()->back()->with('success', 'User has been archived successfully');
-            }
+    //         if ($result) {
+    //             // Send notification to admin 
+    //             auth()->user()->notify(new UserArchivedNotification($user));
+    //             return redirect()->back()->with('success', 'User has been archived successfully');
+    //         }
             
-            return redirect()->back()->with('error', 'Failed to archive user');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to archive user: ' . $e->getMessage());
-        }
+    //         return redirect()->back()->with('error', 'Failed to archive user');
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Failed to archive user: ' . $e->getMessage());
+    //     }
+    // }
+
+    // public function unarchiveUser($id)
+    // {
+    //     try {
+    //         $user = User::findOrFail($id);
+    //         $result = $user->update([
+    //             'is_archived' => false
+    //         ]);
+
+    //         if ($result) {
+    //             // Send notification to admin instead of user
+    //             auth()->user()->notify(new UserUnarchiveNotification($user));
+    //             return redirect()->back()->with('success', 'User unarchived successfully');
+    //         }
+
+    //         return redirect()->back()->with('error', 'Failed to unarchive user');
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->with('error', 'Failed to unarchive user: ' . $e->getMessage());
+    //     }
+    // }
+
+    public function showCreateUser()
+    {
+        return view('admin.users.create');
     }
 
-    public function unarchiveUser($id)
+    public function storeUser(Request $request)
     {
-        try {
-            $user = User::findOrFail($id);
-            $result = $user->update([
-                'is_archived' => false
-            ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,support,user'
+        ]);
 
-            if ($result) {
-                // Send notification to admin instead of user
-                auth()->user()->notify(new UserUnarchiveNotification($user));
-                return redirect()->back()->with('success', 'User unarchived successfully');
-            }
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'is_approved' => true,
+            'email_verified_at' => now(), // Auto verify email for admin-created users
+        ]);
 
-            return redirect()->back()->with('error', 'Failed to unarchive user');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to unarchive user: ' . $e->getMessage());
-        }
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'User created successfully');
     }
 }

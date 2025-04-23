@@ -6,7 +6,14 @@
 
             <!-- Dashboard Header -->
             <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200">
-                <h1 class="text-3xl font-semibold text-gray-800">Admin Dashboard</h1>
+                <!-- Add this near the top of your dashboard content -->
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-semibold text-gray-800">Admin Dashboard</h1>
+                    <a href="{{ route('admin.users.create') }}"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                        Create New User
+                    </a>
+                </div>
 
                 @if (session('success'))
                     <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
@@ -142,14 +149,6 @@
                                                 Approve
                                             </button>
                                         </form>
-                                        <form action="{{ route('admin.archive', $user->id) }}" method="POST"
-                                            class="inline">
-                                            @csrf
-                                            <button type="submit"
-                                                class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
-                                                Archive
-                                            </button>
-                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -210,72 +209,6 @@
                                     class="px-3 py-1 text-xs text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">Next</span>
                             @endif
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Archived Users Section -->
-            <div
-                class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
-                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                    <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                        <span class="w-1 h-5 bg-gray-600 rounded mr-2"></span>
-                        Archived Users
-                    </h2>
-                    <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {{ $archivedUsers->total() }} archived
-                    </span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Role</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-100">
-                            @forelse ($archivedUsers as $user)
-                                <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($user->role) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <form action="{{ route('users.unarchive', $user->id) }}" method="POST"
-                                            class="inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit"
-                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
-                                                Unarchive
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                        No archived users found
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div
-                    class="px-6 py-5 bg-gray-50 border-t border-gray-200 text-xs text-gray-600 flex justify-between items-center">
-                    <div>
-                        Showing {{ $archivedUsers->firstItem() ?? 0 }}–{{ $archivedUsers->lastItem() ?? 0 }} of
-                        {{ $archivedUsers->total() }} archived user(s)
-                    </div>
-                    <div class="text-right">
-                        {{ $archivedUsers->links() }}
                     </div>
                 </div>
             </div>
@@ -414,8 +347,6 @@
                 </div>
             </div>
 
-
-
             <!-- All Tickets Section -->
             <div
                 class="bg-white shadow-sm rounded-lg border border-gray-200 mt-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -424,11 +355,47 @@
                         <span class="w-1 h-5 bg-blue-500 rounded mr-2"></span>
                         All Tickets
                     </h2>
-                    <span
-                        class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center">
-                        <span class="h-1.5 w-1.5 bg-indigo-600 rounded-full mr-1.5"></span>
-                        {{ $tickets->total() }} ticket(s)
-                    </span>
+
+                    <!-- Add this filter section -->
+                    <div class="flex space-x-4">
+
+
+                        <a href="{{ route('admin.dashboard', ['status' => 'open']) }}"
+                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'open' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
+                            <span>Open</span>
+                            <span
+                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'open' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-600' }}">
+                                {{ $openCount }}
+                            </span>
+                        </a>
+
+                        <a href="{{ route('admin.dashboard', ['status' => 'ongoing']) }}"
+                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'ongoing' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
+                            <span>Ongoing</span>
+                            <span
+                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'ongoing' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-600' }}">
+                                {{ $ongoingCount }}
+                            </span>
+                        </a>
+
+                        <a href="{{ route('admin.dashboard', ['status' => 'closed']) }}"
+                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'closed' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
+                            <span>Closed</span>
+                            <span
+                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'closed' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600' }}">
+                                {{ $closedCount }}
+                            </span>
+                        </a>
+
+                        <a href="{{ route('admin.dashboard', ['status' => 'all']) }}"
+                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
+                            <span>All</span>
+                            <span
+                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'all' ? 'bg-indigo-500 text-white' : 'bg-gray-100' }}">
+                                {{ $openCount + $ongoingCount + $closedCount }}
+                            </span>
+                        </a>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -495,28 +462,8 @@
                                         <div class="flex items-center space-x-3">
                                             <a href="{{ route('tickets.show', $ticket) }}"
                                                 class="text-indigo-600 hover:text-indigo-900">View Details</a>
-
-                                            <form action="{{ route('admin.tickets.update-status', $ticket) }}"
-                                                method="POST" class="inline-flex items-center space-x-2">
-                                                @csrf
-                                                @method('PATCH')
-                                                <select name="status"
-                                                    class="w-32 bg-white border border-gray-300 text-gray-700 py-1.5 px-2 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm">
-                                                    <option value="open"
-                                                        {{ $ticket->status === 'open' ? 'selected' : '' }}>Open
-                                                    </option>
-                                                    <option value="ongoing"
-                                                        {{ $ticket->status === 'ongoing' ? 'selected' : '' }}>
-                                                        Ongoing</option>
-                                                    <option value="closed"
-                                                        {{ $ticket->status === 'closed' ? 'selected' : '' }}>
-                                                        Closed</option>
-                                                </select>
-                                                <button type="submit"
-                                                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
-                                                    Update
-                                                </button>
-                                            </form>
+                                            <a href="{{ route('tickets.edit', $ticket) }}"
+                                                class="text-green-600 hover:text-green-900">Edit</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -582,4 +529,10 @@
 
         </div>
     </div>
+
+    <!-- Include Feedback Modal Component -->
+    @foreach ($tickets as $ticket)
+        @include('components.feedback-modal', ['ticket' => $ticket])
+    @endforeach
+    
 @endsection
