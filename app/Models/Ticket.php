@@ -16,7 +16,13 @@ class Ticket extends Model
         'status',
         'priority',
         'user_id',
-        'created_by'
+        'created_by',
+        'updated_by',
+        'is_archived'
+    ];
+
+    protected $casts = [
+        'is_archived' => 'boolean'
     ];
 
     protected static function boot()
@@ -40,5 +46,15 @@ class Ticket extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(TicketFeedback::class);
     }
 }

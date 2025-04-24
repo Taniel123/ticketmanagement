@@ -7,7 +7,17 @@
     @vite('resources/css/app.css')
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 40;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <div class="min-h-screen flex flex-col">
@@ -134,12 +144,12 @@
 
     <!-- Sidebar Toggle Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const toggleButton = document.getElementById('sidebarToggle');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
-            toggleButton.addEventListener('click', function () {
+            toggleButton.addEventListener('click', function() {
                 sidebar.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
             });
