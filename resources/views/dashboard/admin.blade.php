@@ -2,6 +2,16 @@
 
 @section('content')
 
+            <!-- Dashboard Header -->
+            <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200">
+                <!-- Add this near the top of your dashboard content -->
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-semibold text-gray-800">Admin Dashboard</h1>
+                    <a href="{{ route('admin.users.create') }}"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                        Create New User
+                    </a>
+                </div>
 
 
     <!-- Main Content Area -->
