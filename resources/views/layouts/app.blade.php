@@ -161,6 +161,42 @@
                 overlay.classList.add('hidden');
             });
         });
+
+        function toggleFeedback(ticketId, status) {
+            const modal = document.getElementById(`feedback-modal-${ticketId}`);
+            const statusInput = document.getElementById(`selected-status-${ticketId}`);
+
+            // Set the selected status
+            statusInput.value = status;
+
+            // Show modal if status is ongoing or closed
+            if (status === 'ongoing' || status === 'closed') {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeModal(ticketId) {
+            const modal = document.getElementById(`feedback-modal-${ticketId}`);
+            const statusInput = document.getElementById(`selected-status-${ticketId}`);
+            const selectElement = document.querySelector(`#status-${ticketId}`);
+
+            // Reset to original status
+            if (selectElement) {
+                selectElement.value = statusInput.value;
+            }
+
+            // Hide modal
+            modal.classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('fixed')) {
+                const modal = event.target;
+                const ticketId = modal.id.replace('feedback-modal-', '');
+                closeModal(ticketId);
+            }
+        });
     </script>
 </body>
 

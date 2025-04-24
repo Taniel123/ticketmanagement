@@ -117,4 +117,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Add the feedback modal include at the end of the content section -->
+    @foreach ($tickets as $ticket)
+        @include('components.feedback-modal', ['ticket' => $ticket])
+    @endforeach
 @endsection
