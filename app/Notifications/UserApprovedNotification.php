@@ -3,13 +3,17 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class UserApprovedNotification extends Notification
 {
     use Queueable;
+
+    public function __construct()
+    {
+        //
+    }
 
     public function via($notifiable)
     {
@@ -20,9 +24,8 @@ class UserApprovedNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Account Approved')
-            ->line('Your account has been approved!')
-            ->line('You can now login to access your account.')
-            ->action('Login Now', url('/login'))
-            ->line('Thank you for using our application!');
+            ->line('Your account has been approved.')
+            ->line('You can now log in to the system.')
+            ->action('Login', url('/login'));
     }
 }

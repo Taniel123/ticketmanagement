@@ -141,13 +141,10 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap space-x-2">
-                                        <form action="{{ route('admin.approve', $user->id) }}" method="POST"
-                                            class="inline">
+                                        <form action="{{ route('admin.users.approve', $user->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit"
-                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
-                                                Approve
-                                            </button>
+                                            @method('PATCH')
+                                            <button type="submit">Approve User</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -221,7 +218,16 @@
                         <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
                         Manage Users
                     </h2>
+                    <a href="{{ route('admin.tickets.create') }}"
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create New Ticket
+                    </a>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead>
@@ -233,64 +239,51 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Role</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
                             @foreach ($users as $user)
                                 <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">{{ $user->name }}
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">
+                                        {{ $user->name }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $user->email }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                                        {{ $user->email }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $user->role == 'admin'
-                                    ? 'bg-purple-100 text-purple-800'
-                                    : ($user->role == 'support'
-                                        ? 'bg-blue-100 text-blue-800'
-                                        : 'bg-gray-100 text-gray-800') }}">
+                                            {{ $user->role == 'admin'
+                                                ? 'bg-purple-100 text-purple-800'
+                                                : ($user->role == 'support'
+                                                    ? 'bg-blue-100 text-blue-800'
+                                                    : 'bg-gray-100 text-gray-800') }}">
                                             <span
-                                                class="h-1.5 w-1.5 mr-1.5 rounded-full
-                                    {{ $user->role == 'admin' ? 'bg-purple-600' : ($user->role == 'support' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
+                                                class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                                {{ $user->role == 'admin' ? 'bg-purple-600' : ($user->role == 'support' ? 'bg-blue-600' : 'bg-gray-600') }}">
+                                            </span>
                                             {{ ucfirst($user->role) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $user->is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                            <span
-                                                class="h-1.5 w-1.5 mr-1.5 rounded-full 
-                                    {{ $user->is_approved ? 'bg-green-600' : 'bg-yellow-600' }}"></span>
-                                            {{ $user->is_approved ? 'Active' : 'Pending' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <form action="{{ route('admin.changeRole', $user->id) }}" method="POST"
-                                            class="flex items-center space-x-2">
-                                            @csrf
-                                            <select name="role" required
-                                                class="w-32 bg-white border border-gray-300 text-gray-700 py-1.5 px-3 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm shadow-sm">
-                                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User
-                                                </option>
-                                                <option value="support" {{ $user->role == 'support' ? 'selected' : '' }}>
-                                                    Support</option>
-                                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>
-                                                    Admin</option>
-                                            </select>
-                                            <button type="submit"
-                                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">Update</button>
-                                        </form>
+                                    <td class="px-6 py-4 whitespace-nowrap space-x-2">
+                                        <div class="flex items-center space-x-3">
+                                            <a href="{{ route('admin.users.show', $user) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                                View Details
+                                            </a>
+                                            <a href="{{ route('admin.users.edit', $user) }}"
+                                                class="text-green-600 hover:text-green-900 text-sm font-medium">
+                                                Edit
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
 
                             @if (count($users) === 0)
                                 <tr>
-                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
                                         <div class="flex flex-col items-center">
                                             <svg class="h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
@@ -304,46 +297,6 @@
                             @endif
                         </tbody>
                     </table>
-                </div>
-
-                <!-- Table Footer/Pagination -->
-                <div
-                    class="px-6 py-5 bg-gray-50 border-t border-gray-200 text-xs text-gray-600 flex justify-between items-center">
-                    <div>
-                        Showing {{ $users->firstItem() }}–{{ $users->lastItem() }} of {{ $users->total() }} user(s)
-                    </div>
-                    <div class="text-right">
-                        <div class="inline-flex items-center space-x-1">
-                            {{-- Previous Page Link --}}
-                            @if ($users->onFirstPage())
-                                <span
-                                    class="px-3 py-1 text-xs text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">Previous</span>
-                            @else
-                                <a href="{{ $users->previousPageUrl() }}"
-                                    class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Previous</a>
-                            @endif
-
-                            {{-- Pagination Elements --}}
-                            @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-                                @if ($page == $users->currentPage())
-                                    <span
-                                        class="px-3 py-1 text-xs text-white bg-indigo-600 border border-indigo-600 rounded-md">{{ $page }}</span>
-                                @else
-                                    <a href="{{ $url }}"
-                                        class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">{{ $page }}</a>
-                                @endif
-                            @endforeach
-
-                            {{-- Next Page Link --}}
-                            @if ($users->hasMorePages())
-                                <a href="{{ $users->nextPageUrl() }}"
-                                    class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Next</a>
-                            @else
-                                <span
-                                    class="px-3 py-1 text-xs text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">Next</span>
-                            @endif
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -458,12 +411,17 @@
                                             {{ ucfirst($ticket->priority) }}
                                         </span>
                                     </td>
+                                    <!-- Replace the ticket actions section with this -->
                                     <td class="px-6 py-4 whitespace-nowrap space-x-2">
                                         <div class="flex items-center space-x-3">
-                                            <a href="{{ route('tickets.show', $ticket) }}"
-                                                class="text-indigo-600 hover:text-indigo-900">View Details</a>
-                                            <a href="{{ route('tickets.edit', $ticket) }}"
-                                                class="text-green-600 hover:text-green-900">Edit</a>
+                                            <a href="{{ route('admin.tickets.show', $ticket) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                                View Details
+                                            </a>
+                                            <a href="{{ route('admin.tickets.edit', $ticket) }}"
+                                                class="text-green-600 hover:text-green-900 text-sm font-medium">
+                                                Edit
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -534,5 +492,4 @@
     @foreach ($tickets as $ticket)
         @include('components.feedback-modal', ['ticket' => $ticket])
     @endforeach
-    
 @endsection

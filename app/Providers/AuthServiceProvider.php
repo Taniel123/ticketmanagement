@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Providers;
+
+use App\Models\Ticket;
+use App\Policies\TicketPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    protected $policies = [
+        Ticket::class => TicketPolicy::class,
+    ];
+
+    public function boot()
+    {
+        $this->registerPolicies();
+
+        // Define gates if needed
+        Gate::define('update-ticket', [TicketPolicy::class, 'update']);
+    }
+}

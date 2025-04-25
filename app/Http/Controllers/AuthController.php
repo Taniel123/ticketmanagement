@@ -151,33 +151,33 @@ class AuthController extends Controller
     //user dashboard route
     public function showUserDashboard(Request $request)
     {
-        $user = Auth::user();
-        $status = $request->get('status', 'open');
-        
-        // Start with base query
-        $query = $user->tickets();
-        
-        // Apply status filter if not 'all'
+        if (auth()->user()->role !== 'user') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $status = $request->get('status', 'all');
+        $query = Ticket::where('user_id', auth()->id());
+
+        // Apply status filter
         if ($status !== 'all') {
             $query->where('status', $status);
         }
-        
-        // Get filtered tickets
-        $tickets = $query->latest()->paginate(6);
-        
+
         // Get counts for each status
-        $allCount = $user->tickets()->count();
-        $openCount = $user->tickets()->where('status', 'open')->count();
-        $ongoingCount = $user->tickets()->where('status', 'ongoing')->count();
-        $closedCount = $user->tickets()->where('status', 'closed')->count();
-        
+        $openCount = Ticket::where('user_id', auth()->id())->where('status', 'open')->count();
+        $ongoingCount = Ticket::where('user_id', auth()->id())->where('status', 'ongoing')->count();
+        $closedCount = Ticket::where('user_id', auth()->id())->where('status', 'closed')->count();
+        $allCount = Ticket::where('user_id', auth()->id())->count();
+
+        $tickets = $query->latest()->paginate(10);
+
         return view('dashboard.user', compact(
             'tickets',
             'status',
-            'allCount',
             'openCount',
             'ongoingCount',
-            'closedCount'
+            'closedCount',
+            'allCount'
         ));
     }
 
@@ -373,5 +373,40 @@ class AuthController extends Controller
 
         return redirect()->route('admin.dashboard')
             ->with('success', 'User created successfully');
+    }
+
+    public function showUser(User $user)
+    {
+        $tickets = $user->tickets()->latest()->paginate(10);
+        return view('admin.users.show', compact('user', 'tickets'));
+    }
+
+ 
+    public function editUser(User $user)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('admin.users.edit', compact('user'));
+    }
+
+  
+    public function updateUser(Request $request, User $user)
+    {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:user,support,admin',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'User updated successfully');
     }
 }

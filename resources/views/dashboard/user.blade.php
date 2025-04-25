@@ -16,7 +16,7 @@
             <div class="flex items-center space-x-4">
                 <!-- Status Filter Buttons -->
                 <div class="flex space-x-2">
-                    
+
 
                     <a href="{{ route('user.dashboard', ['status' => 'open']) }}"
                         class="inline-flex items-center px-3 py-1.5 rounded-md {{ $status === 'open' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
@@ -55,7 +55,7 @@
                     </a>
                 </div>
 
-                <a href="{{ route('tickets.create') }}"
+                <a href="{{ route('user.tickets.create') }}"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded shadow-sm text-sm font-medium transition-colors duration-200 inline-flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -65,6 +65,25 @@
                 </a>
             </div>
         </div>
+
+        @if (session('success'))
+            <div class="mb-4 rounded-md bg-green-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800">
+                            {{ session('success') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Tickets List -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
@@ -122,15 +141,12 @@
                                         </div>
 
                                         <div class="mt-4 pt-4 border-t border-gray-100">
-                                            <a href="{{ route('tickets.show', $ticket) }}"
-                                                class="w-full inline-flex justify-center items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-indigo-600 text-sm font-medium rounded transition-colors duration-200">
-                                                View Details
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </a>
+                                            <a href="{{ route('user.tickets.show', $ticket) }}">View Ticket</a>
+                                            <form action="{{ route('user.tickets.update', $ticket) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <!-- form content -->
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

@@ -55,65 +55,53 @@ Route::middleware('auth')->group(function () {
 });
 
 // Protected routes requiring authentication and email verification
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     // Common routes for all authenticated users
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // User dashboard route - accessible by users only
-    Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])
-        ->name('user.dashboard')
-        ->middleware('role:user');
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // User dashboard route
+        Route::get('/dashboard/user', [AuthController::class, 'showUserDashboard'])
+            ->name('user.dashboard')
+            ->middleware('role:user');
 
-    // User ticket routes
-    Route::group(['prefix' => 'tickets'], function () {
-        Route::get('/', [TicketController::class, 'index'])->name('tickets.index');
-        Route::get('/create', [TicketController::class, 'create'])->name('tickets.create');
-        Route::post('/', [TicketController::class, 'store'])->name('tickets.store');
-        Route::get('/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
-        Route::get('/{ticket}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
-        Route::patch('/{ticket}', [TicketController::class, 'update'])->name('tickets.update');
-        Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+        // User ticket routes (working)
+        Route::prefix('user/tickets')->middleware('role:user')->group(function () {
+            Route::patch('/{ticket}', [TicketController::class, 'update'])->name('user.tickets.update');
+            Route::get('/', [TicketController::class, 'index'])->name('user.tickets.index');
+            Route::get('/create', [TicketController::class, 'create'])->name('user.tickets.create');
+            Route::post('/', [TicketController::class, 'store'])->name('user.tickets.store');
+            Route::get('/{ticket}', [TicketController::class, 'show'])->name('user.tickets.show');
+            Route::get('/{ticket}/edit', [TicketController::class, 'edit'])->name('user.tickets.edit');
+        });
     });
 
-    // Support routes
-    Route::prefix('support')->middleware('role:support')->group(function () {
-        Route::get('/dashboard', [AuthController::class, 'showSupportDashboard'])
-            ->name('support.dashboard');
-        
-        // Change the route names to be support-specific
-        Route::get('/tickets/{ticket}/edit', [TicketController::class, 'edit'])
-            ->name('support.tickets.edit');
-        Route::patch('/tickets/{ticket}', [TicketController::class, 'update'])
-            ->name('support.tickets.update');
-    });
+    // Admin routes (needs fixing)
+    Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+        // Admin dashboard route
+        Route::get('/dashboard', [AuthController::class, 'showAdminDashboard'])->name('admin.dashboard');
 
-    // Admin routes
-    Route::prefix('admin')->middleware('role:admin')->group(function () {
-        Route::get('/dashboard', [AuthController::class, 'showAdminDashboard'])
-            ->name('admin.dashboard');
-        Route::get('/', [AdminController::class, 'index'])
-            ->name('admin.index');
-        Route::post('/approve/{id}', [AuthController::class, 'approveUser'])
-            ->name('admin.approve');
-            // for deletet user
-        // Route::delete('/delete/{id}', [AuthController::class, 'deleteUser'])
-        //     ->name('admin.delete');
-        Route::post('/change-role/{id}', [AuthController::class, 'changeUserRole'])
-            ->name('admin.changeRole');
-        Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
-            ->name('admin.tickets.update-status');  // Changed name
-        Route::post('/archive/{id}', [AuthController::class, 'archiveUser'])
-            ->name('admin.archive');
-        Route::post('/tickets/{id}/archive', [TicketController::class, 'archiveTicket'])
-            ->name('admin.tickets.archive');
-        Route::post('/tickets/{id}/unarchive', [TicketController::class, 'unarchiveTicket'])
-            ->name('admin.tickets.unarchive');
-        
-        // routes for admin create account
-        Route::get('/users/create', [AuthController::class, 'showCreateUser'])
-            ->name('admin.users.create');
-        Route::post('/users', [AuthController::class, 'storeUser'])
-            ->name('admin.users.store');
+        // Admin user management routes
+        Route::prefix('users')->group(function () {
+            Route::get('/create', [AuthController::class, 'showCreateUser'])->name('admin.users.create');
+            Route::post('/', [AuthController::class, 'storeUser'])->name('admin.users.store');
+            Route::get('/{user}', [AuthController::class, 'showUser'])->name('admin.users.show'); // Add this line
+            Route::get('/{user}/edit', [AuthController::class, 'editUser'])->name('admin.users.edit');
+            Route::patch('/users/{user}', [AuthController::class, 'updateUser'])->name('admin.users.update');
+            Route::patch('/{id}/approve', [AuthController::class, 'approveUser'])->name('admin.users.approve');
+            Route::patch('/{id}/role', [AuthController::class, 'changeUserRole'])->name('admin.users.change-role');
+        });
+
+        // Admin ticket routes
+        Route::prefix('tickets')->group(function () {
+            Route::get('/create', [TicketController::class, 'adminCreate'])->name('admin.tickets.create');
+            Route::post('/', [TicketController::class, 'adminStore'])->name('admin.tickets.store');
+            Route::patch('/{ticket}', [TicketController::class, 'adminUpdate'])->name('admin.tickets.update');
+            Route::get('/', [TicketController::class, 'adminIndex'])->name('admin.tickets.index');
+            Route::get('/{ticket}', [TicketController::class, 'adminShow'])->name('admin.tickets.show');
+            Route::get('/{ticket}/edit', [TicketController::class, 'adminEdit'])->name('admin.tickets.edit');
+            Route::patch('/{ticket}/status', [TicketController::class, 'updateStatus'])->name('admin.tickets.update-status');
+        });
     });
 
     Route::put('/users/{id}/unarchive', [AuthController::class, 'unarchiveUser'])->name('users.unarchive');
@@ -123,4 +111,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     Route::post('/tickets/{id}/archive', [TicketController::class, 'archiveTicket'])->name('tickets.archive');
     //     Route::post('/tickets/{id}/unarchive', [TicketController::class, 'unarchiveTicket'])->name('tickets.unarchive');
     // });
+});
+
+// Support routes should be in their own group
+Route::prefix('support')->middleware(['auth', 'verified', 'approved', 'role:support'])->group(function () {
+    // Support dashboard
+    Route::get('/dashboard', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
+    
+    // Support ticket routes
+    Route::prefix('tickets')->group(function () {
+        Route::patch('/{ticket}', [TicketController::class, 'supportUpdate'])->name('support.tickets.update');
+        Route::get('/{ticket}', [TicketController::class, 'supportShow'])->name('support.tickets.show');
+        Route::get('/{ticket}/edit', [TicketController::class, 'supportEdit'])->name('support.tickets.edit');
+    });
 });

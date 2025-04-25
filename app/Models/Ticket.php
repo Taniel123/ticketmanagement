@@ -18,12 +18,12 @@ class Ticket extends Model
         'user_id',
         'created_by',
         'updated_by',
-        'is_archived'
+        // 'is_archived'
     ];
 
-    protected $casts = [
-        'is_archived' => 'boolean'
-    ];
+    // protected $casts = [
+    //     'is_archived' => 'boolean'
+    // ];
 
     protected static function boot()
     {

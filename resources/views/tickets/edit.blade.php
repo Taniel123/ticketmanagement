@@ -10,7 +10,11 @@
                     </div>
 
                     <form
-                        action="{{ auth()->user()->role === 'support' ? route('support.tickets.update', $ticket) : route('tickets.update', $ticket) }}"
+                        action="{{ auth()->user()->role === 'admin'
+                            ? route('admin.tickets.update', $ticket)
+                            : (auth()->user()->role === 'support'
+                                ? route('support.tickets.update', $ticket)
+                                : route('user.tickets.update', $ticket)) }}"
                         method="POST" class="space-y-6">
                         @csrf
                         @method('PATCH')

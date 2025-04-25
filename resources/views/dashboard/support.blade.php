@@ -54,20 +54,20 @@
                     <!-- Tickets Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID</th>
+                            <thead>
+                                <tr class="bg-gray-50">
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Title</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        User</th>
+                                        Created By</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Status</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Priority</th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions</th>
@@ -75,33 +75,75 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($tickets as $ticket)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->id }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->title }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->user->name }}</td>
+                                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">
+                                            {{ $ticket->title }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                                            {{ $ticket->user->name }}
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ $ticket->status === 'open' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $ticket->status === 'ongoing' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                            {{ $ticket->status === 'closed' ? 'bg-red-100 text-red-800' : '' }}">
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                {{ $ticket->status === 'open'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : ($ticket->status === 'ongoing'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : 'bg-red-100 text-red-800') }}">
+                                                <span
+                                                    class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                                    {{ $ticket->status === 'open'
+                                                        ? 'bg-green-600'
+                                                        : ($ticket->status === 'ongoing'
+                                                            ? 'bg-yellow-600'
+                                                            : 'bg-red-600') }}">
+                                                </span>
                                                 {{ ucfirst($ticket->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex items-center space-x-4">
-                                                <a href="{{ route('tickets.show', $ticket->id) }}"
-                                                    class="text-indigo-600 hover:text-indigo-900">View</a>
-
-                                                <a href="{{ route('support.tickets.edit', $ticket->id) }}"
-                                                    class="text-green-600 hover:text-green-900">Edit</a>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                {{ $ticket->priority === 'high'
+                                                    ? 'bg-red-100 text-red-800'
+                                                    : ($ticket->priority === 'medium'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : 'bg-green-100 text-green-800') }}">
+                                                <span
+                                                    class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                                    {{ $ticket->priority === 'high'
+                                                        ? 'bg-red-600'
+                                                        : ($ticket->priority === 'medium'
+                                                            ? 'bg-yellow-600'
+                                                            : 'bg-green-600') }}">
+                                                </span>
+                                                {{ ucfirst($ticket->priority) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center space-x-3">
+                                                <a href="{{ route('support.tickets.show', $ticket) }}"
+                                                    class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                                    View Details
+                                                </a>
+                                                <a href="{{ route('support.tickets.edit', $ticket) }}"
+                                                    class="text-green-600 hover:text-green-900 text-sm font-medium">
+                                                    Edit
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                            No tickets found
+                                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                            <div class="flex flex-col items-center">
+                                                <svg class="h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <p class="text-sm font-medium">No tickets found</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforelse
