@@ -33,6 +33,12 @@ public function archiveUsers()
      */
     public function manageRoles(Request $request)
 {
+
+         // Fetch pending users who are not approved AND not archived
+         $pendingUsers = User::where('is_approved', false)
+                             ->where('is_archived', false)
+                             ->paginate(10);
+
     $query = User::query()
         ->where('is_approved', true)
         ->where('is_archived', false); // Exclude archived users too
@@ -53,7 +59,7 @@ public function archiveUsers()
 
     $users = $query->paginate(10);
 
-    return view('dashboard.manage-roles', compact('users'));
+    return view('dashboard.manage-roles', compact('users', 'pendingUsers'));
 }
 public function manageTickets(Request $request)
 {
@@ -85,4 +91,34 @@ public function manageTickets(Request $request)
     return view('dashboard.manage-tickets', compact('tickets'));
 }
 
+public function updateRole(Request $request, User $user)
+{
+    $validated = $request->validate([
+        'role' => 'required|in:admin,support,user'
+    ]);
+
+    try {
+        $user->update([
+            'role' => $validated['role']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User role updated successfully',
+            'redirect' => route('admin.manage-roles')
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update role'
+        ], 500);
+    }
 }
+
+
+
+
+}
+
+
+

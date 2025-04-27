@@ -11,40 +11,42 @@ use App\Notifications\TicketNotification;
 use App\Models\User;
 use App\Notifications\TicketUpdateNotification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // Add this
 
 class TicketController extends Controller
 {
-    // Index - Get all tickets based on user role
-    public function index()
-    {
-        $user = Auth::user();
-        
-        switch ($user->role) {
-            case 'admin':
-                // Admin can see all tickets
-                $tickets = Ticket::with('user')
-                    ->latest()
-                    ->paginate(3); // Adjust per page count
-                break;
-                
-            case 'support':
-                // Support can see open and ongoing tickets
-                $tickets = Ticket::with('user')
-                    ->whereIn('status', ['open', 'ongoing'])
-                    ->latest()
-                    ->paginate(3);
-                break;
-                
-            default:
-                // Regular users can only see their own tickets
-                $tickets = Ticket::where('user_id', Auth::id())
-                    ->latest()
-                    ->paginate(3);
-                break;
-        }
+    use AuthorizesRequests; // Add this trait
 
-        return view('tickets.index', compact('tickets'));
+    public function index(Request $request)
+    {
+        // Get all tickets for statistics
+        $allTickets = Ticket::where('user_id', auth()->id())->get();
+        
+        // Get paginated tickets for display
+        $query = Ticket::where('user_id', auth()->id());
+        
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'ongoing') {
+                $query->where(function($q) {
+                    $q->where('status', 'ongoing')
+                      ->orWhere('status', 'in_progress');
+                });
+            } else {
+                $query->where('status', $status);
+            }
+        }
+    
+        $tickets = $query->latest()
+                        ->paginate(10)
+                        ->withQueryString();
+    
+        return view('dashboard.user', [
+            'tickets' => $tickets,
+            'allTickets' => $allTickets
+        ]);
     }
+    
 
     // Show create form
     public function create()
@@ -103,7 +105,7 @@ class TicketController extends Controller
             'status' => 'required|in:open,ongoing,closed',
             'feedback' => 'required_if:status,ongoing,closed'
         ]);
-
+    
         try {
             DB::beginTransaction();
             
@@ -112,10 +114,9 @@ class TicketController extends Controller
             
             // Update ticket status
             $ticket->update(['status' => $request->status]);
-
+    
             // Create feedback if provided
             if ($request->filled('feedback')) {
-                // Changed to ticket_feedbacks (plural)
                 DB::table('ticket_feedbacks')->insert([
                     'ticket_id' => $ticket->id,
                     'user_id' => auth()->id(),
@@ -125,50 +126,80 @@ class TicketController extends Controller
                     'updated_at' => now()
                 ]);
             }
-
+    
             DB::commit();
-
+    
             return redirect()->back()->with('success', 'Ticket status updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
+    
+            // Check if the request is AJAX (for modal)
+            if ($request->ajax()) {
+                // Return error message in case of AJAX request
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update ticket status: ' . $e->getMessage()
+                ]);
+            }
+    
+            // If not AJAX, return back with error
+            return back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
         }
-
-        // If not an AJAX request, return back to the previous page
-        return back()->with('success', 'Ticket status updated successfully.');
-    } catch (\Exception $e) {
-        // Check if the request is AJAX (for modal)
-        if ($request->ajax()) {
-            // Return error message in case of AJAX request
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update ticket status: ' . $e->getMessage()
-            ]);
-        }
-
-        // If not AJAX, return back with error
-        return back()->with('error', 'Failed to update ticket status: ' . $e->getMessage());
     }
-}
 
-
-    // Edit ticket
     public function edit(Ticket $ticket)
     {
-        // Allow both admin and support to edit tickets
-        if (!in_array(auth()->user()->role, ['admin', 'support'])) {
-            abort(403);
-        }
-        
+        $this->authorize('update', $ticket); // Uses TicketPolicy@update
         return view('tickets.edit', compact('ticket'));
     }
-
-    // Update ticket
+    
     public function update(Request $request, Ticket $ticket)
     {
-        // Allow both admin and support to update tickets
-        if (!in_array(auth()->user()->role, ['admin', 'support'])) {
-            abort(403);
+        $this->authorize('update', $ticket); // Uses TicketPolicy@update
+    
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'priority' => 'required|in:low,medium,high',
+            'status' => 'required|in:open,ongoing,closed',
+            'feedback' => 'required_if:status,ongoing,closed'
+        ]);
+    
+        try {
+            DB::beginTransaction();
+    
+            // Add info about who updated the ticket
+            $validated['updated_by'] = auth()->id();
+    
+            // Update the ticket
+            $ticket->update($validated);
+    
+            // If feedback is present, insert it into the feedback table
+            if ($request->filled('feedback')) {
+                DB::table('ticket_feedbacks')->insert([
+                    'ticket_id' => $ticket->id,
+                    'user_id' => auth()->id(),
+                    'comment' => $request->feedback,
+                    'status_change' => $request->status,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+    
+            DB::commit();
+    
+            return redirect()->route('support.dashboard')->with('success', 'Ticket updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to update ticket: ' . $e->getMessage());
+        }
+    }
+    
+    public function adminUpdate(Request $request, Ticket $ticket)
+    {
+        // Check if user is admin
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
         }
 
         $validatedData = $request->validate([
@@ -181,6 +212,9 @@ class TicketController extends Controller
 
         try {
             DB::beginTransaction();
+            
+            // Store old status before update
+            $oldStatus = $ticket->status;
             
             // Store who made the update
             $validatedData['updated_by'] = auth()->id();
@@ -200,8 +234,17 @@ class TicketController extends Controller
                 ]);
             }
 
+            // Notify the ticket owner with all required parameters
+            $ticket->user->notify(new TicketUpdateNotification(
+                $ticket,
+                $oldStatus,
+                $validatedData['status'],
+                auth()->user()
+            ));
+
             DB::commit();
-            return redirect()->route('support.dashboard')->with('success', 'Ticket updated successfully');
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Ticket updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Failed to update ticket: ' . $e->getMessage());
@@ -221,40 +264,42 @@ class TicketController extends Controller
             ->with('success', 'Ticket deleted successfully.');
     }
 
-    // Archive ticket
-    // public function archiveTicket($id)
-    // {
-    //     try {
-    //         $ticket = Ticket::findOrFail($id);
-    //         $result = $ticket->update([
-    //             'is_archived' => true
-    //         ]);
+    public function adminEdit(Ticket $ticket)
+    {
+        $this->authorize('update', $ticket);
+        
+        // Return the admin edit view
+        return view('dashboard.edit', compact('ticket'));
+    }
 
-    //         if ($result) {
-    //             return redirect()->back()->with('success', 'Ticket has been archived successfully');
-    //         }
-            
-    //         return redirect()->back()->with('error', 'Failed to archive ticket');
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Failed to archive ticket: ' . $e->getMessage());
-    //     }
-    // }
+    public function adminCreate()
+{
+    $users = User::where('role', 'user')->get();
+    return view('admin.create_ticket', compact('users'));
+}
 
-    // Unarchive ticket
-    // public function unarchiveTicket($id)
-    // {
-    //     try {
-    //         $ticket = Ticket::findOrFail($id);
-    //         $result = $ticket->update([
-    //             'is_archived' => false
-    //         ]);
+public function adminStore(Request $request)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'priority' => 'required|in:low,medium,high',
+        'user_id' => 'required|exists:users,id'
+    ]);
 
-    //         if ($result) {
-    //             return redirect()->back()->with('success', 'Ticket has been unarchived successfully');
-    //         }
-            
-    //         return redirect()->back()->with('error', 'Failed to unarchive ticket');
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Failed to unarchive ticket: ' . $e->getMessage());
-    //     }
-    // }
+    $ticket = Ticket::create([
+        'title' => $validated['title'],
+        'description' => $validated['description'],
+        'priority' => $validated['priority'],
+        'status' => 'open',
+        'user_id' => $validated['user_id'],
+        'created_by' => auth()->id()
+    ]);
+
+    return redirect()
+        ->route('admin.manage-tickets')
+        ->with('success', 'Ticket created successfully');
+}
+    
+    
+}

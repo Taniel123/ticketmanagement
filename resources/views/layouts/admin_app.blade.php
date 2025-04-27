@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Ticket Management System</title>
     @vite('resources/css/app.css')
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -112,27 +113,7 @@
     </svg>
     Dashboard
 </a>
-<!-- Pending Users -->
-<a href="{{ route('admin.pending-users') }}" 
-   class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg 
-          {{ Route::is('admin.pending-users') ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600' : 'hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 hover:border-l-4 hover:border-indigo-600' }}">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{ Route::is('admin.pending-users') ? 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-    </svg>
-   User Approval
-</a>
 
-<!-- Archive Users -->
-<a href="{{ route('admin.archive-users') }}" 
-    class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg 
-           {{ Route::is('admin.archive-users') ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600' : 'hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 hover:border-l-4 hover:border-indigo-600' }}">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{ Route::is('admin.archive-users') ? 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-    </svg>
-    Archived Users
-</a>
 
 <!-- Manage Roles -->
 <a href="{{ route('admin.manage-roles') }}" 

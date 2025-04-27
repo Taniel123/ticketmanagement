@@ -12,9 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Register the role middleware alias here
         $middleware->alias([
             'role' => CheckRole::class
         ]);
+        
+        // You can add any global middleware here if needed
+        // $middleware->append([]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -193,46 +193,54 @@ class AuthController extends Controller
         if (auth()->user()->role !== 'admin') {
             abort(403);
         }
-    
+
+        // Get all the counts first
+        $pendingUsersCount = User::where('is_approved', false)
+            ->where('is_archived', false)
+            ->count();
+        
+        $totalUsersCount = User::where('is_archived', false)->count();
+        $archivedUsersCount = User::where('is_archived', true)->count();
+
         // Daily tickets: last 7 days
         $dailyTickets = Ticket::selectRaw('DATE(created_at) as date, COUNT(*) as count')
             ->where('created_at', '>=', now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
-    
+
         // Weekly tickets: last 8 weeks
         $weeklyTickets = Ticket::selectRaw('YEARWEEK(created_at, 1) as yearweek, COUNT(*) as count')
             ->where('created_at', '>=', now()->subWeeks(8))
             ->groupBy('yearweek')
             ->orderBy('yearweek')
             ->get();
-    
+
         // Monthly tickets: last 12 months
         $monthlyTickets = Ticket::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
             ->where('created_at', '>=', now()->subMonths(12))
             ->groupBy('month')
             ->orderBy('month')
             ->get();
-    
 
-    
-        // User data
+        // User data with pagination
         $pendingUsers = User::where('is_approved', false)
             ->where('is_archived', false)
             ->paginate(3, ['*'], 'pending_page');
-    
+
         $users = User::where('is_approved', true)
             ->where('is_archived', false)
             ->paginate(3, ['*'], 'users_page');
-    
+
         $archivedUsers = User::where('is_archived', true)
             ->paginate(3, ['*'], 'archived_page');
-    
+
         $tickets = Ticket::with('user')->latest()->paginate(3, ['*'], 'tickets_page');
-    
-        // Consolidated return statement
+
         return view('dashboard.admin', compact(
+            'pendingUsersCount',
+            'totalUsersCount',
+            'archivedUsersCount',
             'dailyTickets',
             'weeklyTickets',
             'monthlyTickets',
@@ -243,41 +251,13 @@ class AuthController extends Controller
         ));
     }
 
-    // Show support dashboard
-    public function showSupportDashboard(Request $request)
-    {
-        if (auth()->user()->role !== 'support') {
-            return redirect()->route(auth()->user()->role . '.dashboard');
-        }
-        
-        // Get the filter from request, default to open tickets
-        $status = $request->get('status', 'open');
-        
-        // Start with base query
-        $query = Ticket::query()->with('user')->latest();
-        
-        // Apply status filter if not 'all'
-        if ($status !== 'all') {
-            $query->where('status', $status);
-        }
-        
-        // Get tickets based on filter
-        $tickets = $query->paginate(10)->withQueryString();
-        
-        // Get counts for each status
-        $openCount = Ticket::where('status', 'open')->count();
-        $ongoingCount = Ticket::where('status', 'ongoing')->count();
-        $closedCount = Ticket::where('status', 'closed')->count();
-        
-        return view('dashboard.support', compact(
-            'tickets', 
-            'status',
-            'openCount',
-            'ongoingCount',
-            'closedCount'
-        ));
+public function showSupportDashboard(Request $request)
+{
+    if (auth()->user()->role !== 'support') {
+        return redirect()->route(auth()->user()->role . '.dashboard');
     }
 
+    // Start with base query
     $query = Ticket::whereIn('status', ['open', 'ongoing'])->latest();
 
     // Apply search filter if there's a search term
@@ -298,7 +278,17 @@ class AuthController extends Controller
     // Paginate results
     $tickets = $query->paginate(10);
 
-    return view('dashboard.support', compact('tickets'));
+    // Get counts for each status
+    $openCount = Ticket::where('status', 'open')->count();
+    $ongoingCount = Ticket::where('status', 'ongoing')->count();
+    $closedCount = Ticket::where('status', 'closed')->count();
+
+    return view('dashboard.support', compact(
+        'tickets',
+        'openCount',
+        'ongoingCount',
+        'closedCount'
+    ));
 }
 
     // Approve User
@@ -437,6 +427,44 @@ class AuthController extends Controller
             return back()->with('success', 'User status updated successfully.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to update user status: ' . $e->getMessage());
+        }
+    }
+
+    public function updateRole(Request $request, $userId)
+    {
+        try {
+            $user = User::findOrFail($userId);
+            
+            $validated = $request->validate([
+                'role' => 'required|in:admin,support,user'
+            ]);
+
+            // Store old role for notification
+            $oldRole = $user->role;
+
+            $user->update([
+                'role' => $validated['role']
+            ]);
+
+            // Optionally send notification
+            try {
+                $user->notify(new RoleChangeNotification($oldRole, $validated['role']));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send role change notification: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Role updated successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Role update failed: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update role: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

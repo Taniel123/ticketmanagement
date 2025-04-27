@@ -1,320 +1,304 @@
 @extends('layouts.support_app')
 
 @section('content')
+<!-- Breadcrumb -->
+<div class="flex items-center text-sm text-gray-500 mb-4 mt-4">
+    <a href="{{ route('support.dashboard') }}" class="hover:text-indigo-600 transition-colors duration-200">Dashboard</a>
+    <svg class="h-5 w-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+    </svg>
+    <span>Support Tickets</span>
+</div>
 
-    <div class="py-6">
-        <!-- Main Card -->
-        <div
-            class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-            <!-- Table Header -->
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                <h2 class="text-lg font-medium text-gray-800 flex items-center">
-                    <span class="w-1 h-5 bg-indigo-600 rounded mr-2"></span>
-                    Manage Tickets
-                </h2>
+<!-- Stats Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <!-- Open Tickets -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100 mr-4">
+                <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-600">Open Tickets</p>
+                <p class="text-2xl font-semibold text-gray-900">{{ $tickets->where('status', 'Open')->count() }}</p>
+            </div>
+        </div>
+    </div>
 
-                <!-- Filters and Search -->
-                <form method="GET" action="{{ request()->url() }}"
-                    class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <!-- Status Dropdown -->
+    <!-- Ongoing Tickets -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 mr-4">
+                <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-600">Ongoing Tickets</p>
+                <p class="text-2xl font-semibold text-gray-900">{{ $tickets->where('status', 'Ongoing')->count() }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Closed Tickets -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-gray-100 mr-4">
+                <svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-600">Closed Tickets</p>
+                <p class="text-2xl font-semibold text-gray-900">{{ $tickets->where('status', 'Closed')->count() }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <h1 class="text-lg font-medium text-gray-800 flex items-center">
+                <span class="w-1.5 h-6 bg-indigo-600 rounded mr-3"></span>
+                Support Tickets
+            </h1>
+
+            <!-- Enhanced Filter Form -->
+            <form id="filterForm" method="GET" action="{{ route('support.dashboard') }}"
+                class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                <div class="flex items-center space-x-3">
                     <select name="status"
-                        class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                        onchange="this.form.submit()">
+                        class="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-w-[120px]">
                         <option value="">All Status</option>
-                        <option value="Open" {{ request('status') === 'Open' ? 'selected' : '' }}>Open</option>
-                        <option value="Ongoing" {{ request('status') === 'Ongoing' ? 'selected' : '' }}>Ongoing</option>
-                        <option value="Closed" {{ request('status') === 'Closed' ? 'selected' : '' }}>Closed</option>
+                        <option value="Open" {{ request('status') == 'Open' ? 'selected' : '' }}>Open</option>
+                        <option value="Ongoing" {{ request('status') == 'Ongoing' ? 'selected' : '' }}>Ongoing</option>
+                        <option value="Closed" {{ request('status') == 'Closed' ? 'selected' : '' }}>Closed</option>
                     </select>
 
-                    <!-- Priority Dropdown -->
                     <select name="priority"
-                        class="px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                        onchange="this.form.submit()">
+                        class="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-w-[120px]">
                         <option value="">All Priorities</option>
-                        <option value="High" {{ request('priority') === 'High' ? 'selected' : '' }}>High</option>
-                        <option value="Medium" {{ request('priority') === 'Medium' ? 'selected' : '' }}>Medium</option>
-                        <option value="Low" {{ request('priority') === 'Low' ? 'selected' : '' }}>Low</option>
+                        <option value="low" {{ request('priority') == 'low' ? 'selected' : '' }}>Low</option>
+                        <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
+                        <option value="high" {{ request('priority') == 'high' ? 'selected' : '' }}>High</option>
                     </select>
 
-                    <!-- Search Input -->
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title..."
-                        class="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded shadow-sm text-sm focus:ring-indigo-500 focus:border-indigo-500"
-                        oninput="clearTimeout(this.delay); this.delay = setTimeout(() => this.form.submit(), 500)">
-                </form>
-
-            </div>
-
-            <!-- Table Content -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead>
-                        <tr class="bg-gray-50">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Priority</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Created by
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        @forelse($tickets as $ticket)
-                                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                            <td class="px-6 py-4">
-                                                <div class="font-medium text-gray-900">{{ $ticket->title }}</div>
-                                                <div class="text-xs text-gray-500 mt-1">{{ Str::limit($ticket->description, 60) }}</div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                            {{ $ticket->status == 'Open' ? 'bg-emerald-100 text-emerald-800' :
-                            ($ticket->status == 'Ongoing' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-800') }}">
-                                                    <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
-                                                            {{ $ticket->status == 'Open' ? 'bg-emerald-600' :
-                            ($ticket->status == 'Ongoing' ? 'bg-indigo-600' : 'bg-slate-600') }}"></span>
-                                                    {{ ucfirst($ticket->status) }}
-                                                </span>
-
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                            {{ $ticket->priority == 'High' ? 'bg-red-100 text-red-800' :
-                            ($ticket->priority == 'Medium' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800') }}">
-                                                    <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
-                                                            {{ $ticket->priority == 'High' ? 'bg-red-600' :
-                            ($ticket->priority == 'Medium' ? 'bg-amber-600' : 'bg-blue-600') }}"></span>
-                                                    {{ ucfirst($ticket->priority) }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-gray-700">
-                                                {{ $ticket->user->name }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap space-x-2">
-                                                <div class="flex items-center space-x-3">
-
-                                                    <button type="button" onclick="openTicketModal(
-                                                {{ $ticket->id }},
-                                                '{{ addslashes($ticket->title) }}',
-                                                '{{ addslashes($ticket->description) }}',
-                                                '{{ $ticket->priority }}',
-                                                '{{ addslashes($ticket->user->name) }}',
-                                                '{{ $ticket->status }}'
-                                            )" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors duration-200 shadow-sm">
-                                                        Edit
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                    <div class="flex flex-col items-center">
-                                        <svg class="h-8 w-8 mb-2 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                        <p class="text-sm font-medium">No tickets found</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Table Footer/Pagination -->
-            <div
-                class="px-6 py-5 bg-gray-50 border-t border-gray-200 text-xs text-gray-600 flex justify-between items-center">
-                <div>
-                    Showing {{ $tickets->firstItem() }}–{{ $tickets->lastItem() }} of {{ $tickets->total() }} ticket(s)
+                    <div class="relative">
+                        <input type="text" name="search" value="{{ request('search') }}" 
+                            placeholder="Search tickets..." 
+                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-64">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <div class="inline-flex items-center space-x-1">
-                        {{-- Previous Page Link --}}
-                        @if ($tickets->onFirstPage())
-                            <span
-                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'open' ? 'bg-green-500 text-white' : 'bg-green-100 text-green-600' }}">
-                                {{ $openCount }}
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr class="bg-gray-50">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created By</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($tickets as $ticket)
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#{{ $ticket->id }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ $ticket->title }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <span class="text-xs font-medium text-indigo-600">
+                                        {{ strtoupper(substr($ticket->user->name, 0, 2)) }}
+                                    </span>
+                                </div>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ $ticket->user->name }}</div>
+                                    <div class="text-xs text-gray-500">{{ $ticket->created_at->format('M d, Y') }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {{ $ticket->status === 'Open' ? 'bg-green-100 text-green-800' : 
+                                   ($ticket->status === 'Ongoing' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
+                                <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                    {{ $ticket->status === 'Open' ? 'bg-green-600' : 
+                                       ($ticket->status === 'Ongoing' ? 'bg-blue-600' : 'bg-gray-600') }}"></span>
+                                {{ $ticket->status }}
                             </span>
-                        </a>
-
-                        <a href="{{ route('support.dashboard', ['status' => 'ongoing']) }}"
-                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'ongoing' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
-                            <span>Ongoing</span>
-                            <span
-                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'ongoing' ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-600' }}">
-                                {{ $ongoingCount }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {{ $ticket->priority === 'high' ? 'bg-red-100 text-red-800' : 
+                                   ($ticket->priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
+                                <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
+                                    {{ $ticket->priority === 'high' ? 'bg-red-600' : 
+                                       ($ticket->priority === 'medium' ? 'bg-yellow-600' : 'bg-green-600') }}"></span>
+                                {{ ucfirst($ticket->priority) }}
                             </span>
-                        </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center space-x-3">
+                                <a href="{{ route('tickets.show', $ticket->id) }}"
+                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        View
+                                    </a>
+                                    <a href="{{ route('tickets.edit', $ticket->id) }}"
+                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                </div>
+                            </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center">
+                            <div class="flex flex-col items-center">
+                                <svg class="h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <h3 class="text-sm font-medium text-gray-900">No tickets found</h3>
+                                <p class="mt-1 text-sm text-gray-500">No tickets match your current filters.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+        <!-- Table Footer/Pagination -->
+        <div class="px-6 py-5 bg-gray-50 border-t border-gray-200 text-xs text-gray-600 flex justify-between items-center">
+            <div>
+                Showing {{ $tickets->firstItem() ?? 0 }}–{{ $tickets->lastItem() ?? 0 }} of {{ $tickets->total() }} ticket(s)
+            </div>
+            <div class="text-right">
+                <div class="inline-flex items-center space-x-1">
+                    @if ($tickets->onFirstPage())
+                        <span
+                            class="px-3 py-1 text-xs text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">Previous</span>
+                    @else
+                        <a href="{{ $tickets->previousPageUrl() }}"
+                            class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Previous</a>
+                    @endif
 
-                        <a href="{{ route('support.dashboard', ['status' => 'closed']) }}"
-                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'closed' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
-                            <span>Closed</span>
+                    @foreach ($tickets->getUrlRange(1, $tickets->lastPage()) as $page => $url)
+                        @if ($page == $tickets->currentPage())
                             <span
-                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'closed' ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600' }}">
-                                {{ $closedCount }}
-                            </span>
-                        </a>
+                                class="px-3 py-1 text-xs text-white bg-indigo-600 border border-indigo-600 rounded-md">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}"
+                                class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">{{ $page }}</a>
+                        @endif
+                    @endforeach
 
-                        <a href="{{ route('support.dashboard', ['status' => 'all']) }}"
-                            class="inline-flex items-center px-4 py-2 rounded-md {{ $status === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' }}">
-                            <span>All Tickets</span>
-                            <span
-                                class="ml-2 px-2 py-0.5 text-xs rounded-full {{ $status === 'all' ? 'bg-indigo-500 text-white' : 'bg-gray-100' }}">
-                                {{ $openCount + $ongoingCount + $closedCount }}
-                            </span>
-                        </a>
-                    </div>
-
-
-
-                    <!-- Tickets Table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Title</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        User</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($tickets as $ticket)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->id }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->title }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">{{ $ticket->user->name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            {{ $ticket->status === 'open' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $ticket->status === 'ongoing' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                            {{ $ticket->status === 'closed' ? 'bg-red-100 text-red-800' : '' }}">
-                                                {{ ucfirst($ticket->status) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div class="flex items-center space-x-4">
-                                                <a href="{{ route('tickets.show', $ticket->id) }}"
-                                                    class="text-indigo-600 hover:text-indigo-900">View</a>
-
-                                                <a href="{{ route('support.tickets.edit', $ticket->id) }}"
-                                                    class="text-green-600 hover:text-green-900">Edit</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                            No tickets found
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="mt-4">
-                        {{ $tickets->links() }}
-                    </div>
+                    @if ($tickets->hasMorePages())
+                        <a href="{{ $tickets->nextPageUrl() }}"
+                            class="px-3 py-1 text-xs text-indigo-600 border border-indigo-600 rounded-md hover:bg-indigo-50">Next</a>
+                    @else
+                        <span
+                            class="px-3 py-1 text-xs text-gray-400 bg-gray-100 border border-gray-300 rounded-md cursor-not-allowed">Next</span>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-@endsection
 
-<div id="openTicketModal"
-    class="fixed inset-0 bg-black/30 z-50 hidden flex items-center justify-center backdrop-blur-xs">
-    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-xl">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Update Ticket Details</h2>
+    <!-- Modal for Viewing/Editing Ticket -->
+    <div id="openTicketModal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center backdrop-blur-xs">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-xl">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Update Ticket Details</h2>
 
-        <form id="ticketForm" method="POST">
-            @csrf
-            @method('PATCH')
+            <form id="ticketForm" method="POST">
+                @csrf
+                @method('PATCH')
 
-            <!-- Ticket ID -->
-            <input type="hidden" id="ticketId" name="ticketId" />
+                <!-- Title -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Title:</label>
+                    <p id="modalTitle" class="text-gray-900 mt-1 text-sm font-medium"></p>
+                </div>
 
-            <!-- Title -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Title:</label>
-                <p id="modalTitle" class="text-gray-900 mt-1 text-sm font-medium"></p>
-            </div>
+                <!-- Description -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Description:</label>
+                    <p id="modalDescription" class="text-gray-800 mt-1 text-sm"></p>
+                </div>
 
-            <!-- Description -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Description:</label>
-                <p id="modalDescription" class="text-gray-800 mt-1 text-sm"></p>
-            </div>
+                <!-- Priority -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Priority:</label>
+                    <p id="modalPriority" class="text-gray-900 mt-1 text-sm font-medium"></p>
+                </div>
 
-            <!-- Priority -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Priority:</label>
-                <p id="modalPriority" class="text-gray-900 mt-1 text-sm font-medium"></p>
-            </div>
+                <!-- Created By -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Created By:</label>
+                    <p id="modalUser" class="text-gray-900 mt-1 text-sm font-medium"></p>
+                </div>
 
-            <!-- Created By -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Created By:</label>
-                <p id="modalUser" class="text-gray-900 mt-1 text-sm font-medium"></p>
-            </div>
+                <!-- Status Dropdown -->
+                <div class="mb-6">
+                    <label for="modalStatus" class="block text-sm font-medium text-gray-700">Status:</label>
+                    <select name="status" id="modalStatus"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="Open">Open</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
 
-            <!-- Status Dropdown -->
-            <div class="mb-6">
-                <label for="modalStatus" class="block text-sm font-medium text-gray-700">Status:</label>
-                <select name="status" id="modalStatus"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="Open">Open</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Closed">Closed</option>
-                </select>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="flex justify-end gap-4">
-                <button type="button" onclick="closeTicketModal()"
-                    class="text-gray-700 bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md text-sm font-medium">Cancel</button>
-                <button type="submit"
-                    class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-2 rounded-md text-sm font-semibold">Update</button>
-            </div>
-        </form>
+                <!-- Modal Footer -->
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeTicketModal()"
+                        class="text-gray-700 bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md text-sm font-medium">Cancel</button>
+                    <button type="submit"
+                        class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-2 rounded-md text-sm font-semibold">Update</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-
+    <!-- Keep the feedback modal include if needed -->
+    @foreach ($tickets as $ticket)
+        @include('components.feedback-modal', ['ticket' => $ticket])
+    @endforeach
+@endsection
 
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('form');
+            const form = document.getElementById('filterForm');
 
-            // Auto-submit on dropdown change for filters (NOT for modal)
+            // Auto-submit on dropdown change
             form.querySelectorAll('select').forEach(select => {
-                select.addEventListener('change', (event) => {
-                    // Ignore auto-submit for the modal's status dropdown
-                    if (event.target.id !== 'modalStatus') {
-                        form.submit();
-                    }
+                select.addEventListener('change', () => {
+                    form.submit();
                 });
             });
 
@@ -328,44 +312,29 @@
                 });
             }
         });
-        function openTicketModal(id, title, description, priority, user, status) {
-            const modal = document.getElementById('openTicketModal');
 
-            // Check if the modal is found
-            if (!modal) {
-                console.error("Modal element not found!");
-                return;
-            }
-
-            // Set modal visibility
-            modal.classList.remove('hidden');
-
+        function openTicketModal(ticketId, title, description, priority, userName, status) {
             // Populate modal fields
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDescription').innerText = description;
-            document.getElementById('modalPriority').innerText = priority;
-            document.getElementById('modalUser').innerText = user;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalPriority').textContent = priority;
+            document.getElementById('modalUser').textContent = userName;
             document.getElementById('modalStatus').value = status;
 
-            // Set ticket ID for form submission (hidden input for ticket ID)
-            document.getElementById('ticketId').value = id;
+            // Update form action URL
+            const form = document.getElementById('ticketForm');
+            form.action = `/support/tickets/${ticketId}/status`;
 
-            // Set form action (you should set this to the URL that handles the ticket update, e.g., /tickets/{id})
-            document.getElementById('ticketForm').action = `/support/tickets/${id}/status`;
+            // Show modal
+            const modal = document.getElementById('openTicketModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        // Function to close the modal
         function closeTicketModal() {
             const modal = document.getElementById('openTicketModal');
-
-            if (!modal) {
-                console.error("Modal element not found!");
-                return;
-            }
-
             modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
-
-
     </script>
 @endsection
