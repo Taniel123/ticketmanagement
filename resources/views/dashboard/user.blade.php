@@ -87,16 +87,16 @@
                     @foreach ($tickets as $ticket)
                         <div class="group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
                             <div class="h-2 
-                                {{ $ticket->status == 'open' ? 'bg-green-500' : 
-                                  ($ticket->status == 'in_progress' ? 'bg-blue-500' : 'bg-gray-400') }}">
+                                {{ $ticket->status == 'open' ? 'bg-indigo-500' : 
+                                  ($ticket->status == 'in_progress' ? 'bg-blue-500' : 'bg-indigo-400') }}">
                             </div>
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="text-lg font-medium text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
                                         {{ $ticket->title }}
-                                    </h3>
+                                      </h3>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        {{ $ticket->status == 'open' ? 'bg-green-100 text-green-800' : 
+                                        {{ $ticket->status == 'Open' ? 'bg-green-100 text-green-800' : 
                                           ($ticket->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
                                         <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
                                             {{ $ticket->status == 'open' ? 'bg-green-600' : 
