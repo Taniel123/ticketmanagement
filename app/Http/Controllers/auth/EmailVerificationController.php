@@ -43,7 +43,7 @@ class EmailVerificationController extends Controller
             DB::commit();
 
             return redirect()->route('login')
-                ->with('success', 'Email verified successfully! Please wait for admin approval before logging in.');
+                ->with('success', 'Email verified successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();

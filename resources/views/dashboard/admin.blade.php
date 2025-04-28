@@ -25,8 +25,8 @@
                         </div>
                     @endif
 
-         <!-- Stats Summary -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
+<!-- Stats Summary -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
     <!-- Pending Users -->
     <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
         <div class="flex items-center justify-between mb-4">
@@ -89,30 +89,8 @@
             </div>
         </div>
     </div>
-
-    <!-- Archived Users -->
-    <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base sm:text-lg font-medium text-gray-800">Archived Users</h2>
-            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Today</span>
-        </div>
-        <div class="flex items-center">
-            <div class="bg-gray-100 p-3 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 17v-2a4 4 0 014-4h1V7a2 2 0 012-2h2a2 2 0 012 2v2h-2a2 2 0 00-2 2v1h-1a4 4 0 00-4 4v2H9z" />
-                </svg>
-            </div>
-            <div class="ml-4">
-                <span class="text-xl sm:text-2xl font-bold text-gray-900">{{ $archivedUsers->total() }}</span>
-                <p class="text-xs text-gray-500">Archived accounts</p>
-            </div>
-        </div>
-    </div>
 </div>
 
-                                <!-- Ticket Analytics -->
 <!-- Ticket Analytics -->
 <div class="bg-white rounded-lg shadow-lg mt-10 px-5 py-4 border border-gray-200">
     <div class="mb-6 flex justify-between items-center">
@@ -191,24 +169,22 @@
             ],
             weekly: [
                 @foreach($weeklyTickets as $w)
-                    '{{ \Carbon\Carbon::parse($w->date)->format('M d') }}',
+                    'Week {{ substr($w->yearweek, -2) }}',
                 @endforeach
             ],
             monthly: [
                 @foreach($monthlyTickets as $m)
-                    '{{ \Carbon\Carbon::parse($m->date)->format('M Y') }}',
+                    '{{ \Carbon\Carbon::parse($m->month.'-01')->format('M Y') }}',
                 @endforeach
             ]
         };
         
         // Function to create or update chart
         function updateChart(viewMode) {
-            // Destroy existing chart if it exists
             if (ticketAnalyticsChart) {
                 ticketAnalyticsChart.destroy();
             }
             
-            // Create new chart with selected dataset
             ticketAnalyticsChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -267,6 +243,7 @@
         });
     });
 </script>
+
 
         
                 </div>

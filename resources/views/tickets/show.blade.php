@@ -1,16 +1,11 @@
-@extends('layouts.support_app')
+@extends('layouts.show_app')
 
 @section('content')
 <div class="py-6 bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
         <!-- Breadcrumb -->
         <div class="flex items-center text-sm text-gray-500 mb-6 space-x-2">
-            <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('user.dashboard') }}" 
-                class="hover:text-indigo-600 transition-colors duration-200">Dashboard</a>
-            <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-            </svg>
-            <span>Ticket Details</span>
+
         </div>
 
         <!-- Header Section -->
@@ -18,7 +13,7 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 flex items-center">
                     <span class="w-1.5 h-6 bg-indigo-600 rounded mr-3"></span>
-                    Ticket
+                    Ticket Details
                 </h1>
                 <p class="text-sm text-gray-600 mt-1">Created {{ $ticket->created_at->format('M d, Y h:i A') }}</p>
             </div>
@@ -26,11 +21,11 @@
             <!-- Ticket Status Badge -->
             <div class="mt-4 md:mt-0 flex items-center space-x-4">
                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium
-                    {{ $ticket->status === 'open' ? 'bg-green-100 text-green-800' : 
-                       ($ticket->status === 'ongoing' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
+                    {{ $ticket->status === 'Open' ? 'bg-green-100 text-green-800' : 
+                       ($ticket->status === 'Ongoing' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
                     <span class="w-1.5 h-1.5 rounded-full 
-                        {{ $ticket->status === 'open' ? 'bg-green-600' : 
-                           ($ticket->status === 'ongoing' ? 'bg-yellow-600' : 'bg-red-600') }} mr-2"></span>
+                        {{ $ticket->status === 'Open' ? 'bg-green-600' : 
+                           ($ticket->status === 'Ongoing' ? 'bg-yellow-600' : 'bg-red-600') }} mr-2"></span>
                     {{ ucfirst($ticket->status) }}
                 </span>
             </div>
@@ -107,11 +102,11 @@
                             <dt class="text-sm font-medium text-gray-500">Priority</dt>
                             <dd class="mt-1 flex items-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    {{ $ticket->priority === 'high' ? 'bg-red-100 text-red-800' : 
-                                       ($ticket->priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
+                                    {{ $ticket->priority === 'High' ? 'bg-red-100 text-red-800' : 
+                                       ($ticket->priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
                                     <span class="w-1.5 h-1.5 rounded-full 
-                                        {{ $ticket->priority === 'high' ? 'bg-red-600' : 
-                                           ($ticket->priority === 'medium' ? 'bg-yellow-600' : 'bg-green-600') }} mr-1.5"></span>
+                                        {{ $ticket->priority === 'High' ? 'bg-red-600' : 
+                                           ($ticket->priority === 'Medium' ? 'bg-yellow-600' : 'bg-green-600') }} mr-1.5"></span>
                                     {{ ucfirst($ticket->priority) }}
                                 </span>
                             </dd>

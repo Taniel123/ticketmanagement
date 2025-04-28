@@ -80,7 +80,8 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:support'])->grou
     Route::get('/dashboard', [AuthController::class, 'showSupportDashboard'])->name('support.dashboard');
     Route::get('/tickets/{ticket}/edit', [TicketController::class, 'edit'])->name('support.tickets.edit');
     Route::patch('/tickets/{ticket}', [TicketController::class, 'update'])->name('support.tickets.update');
-    Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])->name('support.tickets.status');
+    Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
+    ->name('support.tickets.update-status');
 });
 
     // Admin routes
@@ -105,6 +106,7 @@ Route::prefix('support')->middleware(['auth', 'verified', 'role:support'])->grou
             ->name('admin.tickets.archive');
         Route::post('/tickets/{id}/unarchive', [TicketController::class, 'unarchiveTicket'])
             ->name('admin.tickets.unarchive');
+            
 
           // ...existing admin routes...
     Route::get('/tickets/create', [TicketController::class, 'adminCreate'])->name('admin.tickets.create');

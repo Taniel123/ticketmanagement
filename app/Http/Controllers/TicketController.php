@@ -19,32 +19,45 @@ class TicketController extends Controller
 
     public function index(Request $request)
     {
-        // Get all tickets for statistics
-        $allTickets = Ticket::where('user_id', auth()->id())->get();
-        
-        // Get paginated tickets for display
-        $query = Ticket::where('user_id', auth()->id());
-        
-        if ($request->filled('status')) {
-            $status = $request->status;
-            if ($status === 'ongoing') {
-                $query->where(function($q) {
-                    $q->where('status', 'ongoing')
-                      ->orWhere('status', 'in_progress');
-                });
-            } else {
-                $query->where('status', $status);
-            }
+       // Get all tickets for statistics
+    $allTickets = Ticket::where('user_id', auth()->id())->get();
+    
+    // Get paginated tickets for display with priority ordering
+    $query = Ticket::query();
+
+    // Add user filter for non-admin/support users
+    if (auth()->user()->role === 'user') {
+        $query->where('user_id', auth()->id());
+    }
+    
+    // Apply status filter if provided
+    if ($request->filled('status')) {
+        $status = $request->status;
+        if ($status === 'ongoing') {
+            $query->where(function($q) {
+                $q->where('status', 'ongoing')
+                  ->orWhere('status', 'in_progress');
+            });
+        } else {
+            $query->where('status', $status);
         }
-    
-        $tickets = $query->latest()
-                        ->paginate(10)
-                        ->withQueryString();
-    
-        return view('dashboard.user', [
-            'tickets' => $tickets,
-            'allTickets' => $allTickets
-        ]);
+    }
+
+    // Add priority-based ordering
+    $query->orderByRaw("CASE 
+        WHEN priority = 'high' THEN 1 
+        WHEN priority = 'medium' THEN 2 
+        WHEN priority = 'low' THEN 3 
+        END")
+        ->orderBy('created_at', 'desc'); // Secondary sorting by creation date
+
+    $tickets = $query->paginate(10)
+                    ->withQueryString();
+
+    return view('dashboard.user', [
+        'tickets' => $tickets,
+        'allTickets' => $allTickets
+    ]);
     }
     
 
@@ -243,7 +256,7 @@ class TicketController extends Controller
             ));
 
             DB::commit();
-            return redirect()->route('admin.dashboard')
+            return redirect()->route('admin.manage-tickets')
                 ->with('success', 'Ticket updated successfully');
         } catch (\Exception $e) {
             DB::rollBack();

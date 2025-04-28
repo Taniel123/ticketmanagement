@@ -148,8 +148,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $ticket->priority === 'high' ? 'bg-red-100 text-red-800' : 
-                                   ($ticket->priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
+                                {{ $ticket->priority === 'High' ? 'bg-red-100 text-red-800' : 
+                                   ($ticket->priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') }}">
                                 <span class="h-1.5 w-1.5 mr-1.5 rounded-full 
                                     {{ $ticket->priority === 'high' ? 'bg-red-600' : 
                                        ($ticket->priority === 'medium' ? 'bg-yellow-600' : 'bg-green-600') }}"></span>
@@ -166,13 +166,13 @@
                                         </svg>
                                         View
                                     </a>
-                                    <a href="{{ route('tickets.edit', $ticket->id) }}"
-                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                        Edit
-                                    </a>
+                                    <button onclick="handleEditClick({{ json_encode($ticket) }})"
+    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+    <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+    </svg>
+    Edit
+</button>
                                 </div>
                             </td>
                     </tr>
@@ -229,61 +229,92 @@
         </div>
     </div>
 
-    <!-- Modal for Viewing/Editing Ticket -->
-    <div id="openTicketModal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center backdrop-blur-xs">
-        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-xl">
-            <h2 class="text-xl font-semibold text-gray-800 mb-6">Update Ticket Details</h2>
-
-            <form id="ticketForm" method="POST">
-                @csrf
-                @method('PATCH')
-
-                <!-- Title -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Title:</label>
-                    <p id="modalTitle" class="text-gray-900 mt-1 text-sm font-medium"></p>
-                </div>
-
-                <!-- Description -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Description:</label>
-                    <p id="modalDescription" class="text-gray-800 mt-1 text-sm"></p>
-                </div>
-
-                <!-- Priority -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Priority:</label>
-                    <p id="modalPriority" class="text-gray-900 mt-1 text-sm font-medium"></p>
-                </div>
-
-                <!-- Created By -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700">Created By:</label>
-                    <p id="modalUser" class="text-gray-900 mt-1 text-sm font-medium"></p>
-                </div>
-
-                <!-- Status Dropdown -->
-                <div class="mb-6">
-                    <label for="modalStatus" class="block text-sm font-medium text-gray-700">Status:</label>
-                    <select name="status" id="modalStatus"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="Open">Open</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Closed">Closed</option>
-                    </select>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="flex justify-end gap-4">
-                    <button type="button" onclick="closeTicketModal()"
-                        class="text-gray-700 bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-md text-sm font-medium">Cancel</button>
-                    <button type="submit"
-                        class="bg-indigo-600 text-white hover:bg-indigo-700 px-6 py-2 rounded-md text-sm font-semibold">Update</button>
-                </div>
-            </form>
+    
+ <!-- Replace the existing modal content -->
+<div id="openTicketModal" class="fixed inset-0 bg-black/30 z-50 hidden items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                <span class="w-1.5 h-6 bg-indigo-600 mr-3 rounded"></span>
+                Update Ticket Status
+            </h2>
+            <button type="button" onclick="closeTicketModal()" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
-    </div>
 
+        <!-- Ticket Details (Read-only) -->
+        <div class="mb-6 space-y-4">
+            <div>
+            
+                <p id="modalTitle" class="mt-1 text-sm text-gray-900"></p>
+            </div>
+            
+            <div>
+               
+                <p id="modalDescription" class="mt-1 text-sm text-gray-900 whitespace-pre-line"></p>
+            </div>
+            
+            <div>
+                
+                <p id="modalPriority" class="mt-1 text-sm text-gray-900"></p>
+            </div>
+        </div>
+
+        <!-- Form for Status Update -->
+        <form id="ticketForm" method="POST" class="space-y-6">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="ticket_id" id="modalTicketId">
+
+            <!-- Status -->
+            <div class="space-y-1">
+                <label for="status" class="block text-sm font-medium text-gray-700">
+                    Status <span class="text-red-500">*</span>
+                </label>
+                <select 
+                    name="status" 
+                    id="modalStatus" 
+                    required
+                    onchange="toggleFeedback(this.value)"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="open">Open</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+
+            <!-- Feedback -->
+            <div id="feedbackSection" class="space-y-1">
+                <label for="feedback" class="block text-sm font-medium text-gray-700">
+                    Feedback <span id="feedbackRequired" class="text-red-500 hidden">*</span>
+                </label>
+                <textarea 
+                    name="feedback" 
+                    id="modalFeedback" 
+                    rows="3"
+                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Add your feedback here..."></textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" 
+                    onclick="closeTicketModal()"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                    Update Status
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
     <!-- Keep the feedback modal include if needed -->
     @foreach ($tickets as $ticket)
         @include('components.feedback-modal', ['ticket' => $ticket])
@@ -313,28 +344,73 @@
             }
         });
 
-        function openTicketModal(ticketId, title, description, priority, userName, status) {
-            // Populate modal fields
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalDescription').textContent = description;
-            document.getElementById('modalPriority').textContent = priority;
-            document.getElementById('modalUser').textContent = userName;
-            document.getElementById('modalStatus').value = status;
+     // Add this to your existing scripts section
+function openTicketModal(ticket) {
+    // Populate form fields
+    document.getElementById('modalTitle').value = ticket.title;
+    document.getElementById('modalDescription').value = ticket.description;
+    document.getElementById('modalPriority').value = ticket.priority;
+    document.getElementById('modalStatus').value = ticket.status;
+    
+    // Update form action URL
+    const form = document.getElementById('ticketForm');
+    form.action = `/support/tickets/${ticket.id}/update`;
+    
+    // Show modal
+    const modal = document.getElementById('openTicketModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 
-            // Update form action URL
-            const form = document.getElementById('ticketForm');
-            form.action = `/support/tickets/${ticketId}/status`;
+    // Initialize feedback visibility
+    toggleFeedback(ticket.status);
+}
 
-            // Show modal
-            const modal = document.getElementById('openTicketModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
+function toggleFeedback(status) {
+    const feedbackSection = document.getElementById('feedbackSection');
+    const feedbackRequired = document.getElementById('feedbackRequired');
+    const feedbackInput = document.getElementById('modalFeedback');
+    
+    if (status === 'ongoing' || status === 'closed') {
+        feedbackRequired.classList.remove('hidden');
+        feedbackInput.required = true;
+    } else {
+        feedbackRequired.classList.add('hidden');
+        feedbackInput.required = false;
+    }
+}
 
-        function closeTicketModal() {
-            const modal = document.getElementById('openTicketModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
+function handleEditClick(ticket) {
+    const modal = document.getElementById('openTicketModal');
+    const form = document.getElementById('ticketForm');
+    
+    // Set the correct form action
+    form.action = `/support/tickets/${ticket.id}/status`;
+    
+    // Set form fields
+    document.getElementById('modalTicketId').value = ticket.id;
+    document.getElementById('modalTitle').value = ticket.title;
+    document.getElementById('modalDescription').value = ticket.description;
+    document.getElementById('modalPriority').value = ticket.priority;
+    document.getElementById('modalStatus').value = ticket.status.toLowerCase();
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Initialize feedback visibility
+    toggleFeedback(ticket.status.toLowerCase());
+}
+
+function closeTicketModal() {
+    const modal = document.getElementById('openTicketModal');
+    const form = document.getElementById('ticketForm');
+    
+    // Hide modal
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    
+    // Reset form
+    form.reset();
+}
     </script>
 @endsection

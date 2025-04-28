@@ -257,8 +257,8 @@ public function showSupportDashboard(Request $request)
         return redirect()->route(auth()->user()->role . '.dashboard');
     }
 
-    // Start with base query
-    $query = Ticket::whereIn('status', ['open', 'ongoing'])->latest();
+    // Start with base query - remove the whereIn condition to show all tickets
+    $query = Ticket::latest();
 
     // Apply search filter if there's a search term
     if ($request->has('search') && $request->search != '') {
@@ -384,9 +384,7 @@ public function showSupportDashboard(Request $request)
     public function showCreateUser()
     {
         return view('admin.users.create');
-    }
-
-    public function storeUser(Request $request)
+    }public function storeUser(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -394,17 +392,21 @@ public function showSupportDashboard(Request $request)
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,support,user'
         ]);
-
+    
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'is_approved' => true,
-            'email_verified_at' => now(), // Auto verify email for admin-created users
+            // Remove email_verified_at to require verification
         ]);
-
-        return redirect()->route('admin.dashboard')
+    
+        // Trigger verification email
+        event(new Registered($user));
+    
+        // Redirect to manage roles page instead of dashboard
+        return redirect()->route('admin.manage-roles')
             ->with('success', 'User created successfully');
     }
     public function updateUserStatus(Request $request, $id)

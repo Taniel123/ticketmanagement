@@ -107,21 +107,33 @@
                                 </div>
                                 
                                 <p class="text-sm text-gray-500 mb-4">{{ Str::limit($ticket->description, 120) }}</p>
-                                
-                                <div class="flex items-center text-xs text-gray-500 mb-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {{ $ticket->created_at->diffForHumans() }}
-                                </div>
+    
+    <!-- Time and Feedback Status -->
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+        <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ $ticket->created_at->diffForHumans() }}
+        </div>
+        
+        @if($ticket->feedbacks->count() > 0)
+            <div class="flex items-center text-indigo-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+                <span>{{ $ticket->feedbacks->count() }} {{ Str::plural('comment', $ticket->feedbacks->count()) }}</span>
+            </div>
+        @endif
+    </div>
 
-                                <a href="{{ route('tickets.show', $ticket) }}" 
-                                   class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium rounded-md transition-colors duration-200">
-                                    View Details
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
+    <a href="{{ route('tickets.show', $ticket) }}" 
+       class="w-full inline-flex justify-center items-center px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-medium rounded-md transition-colors duration-200">
+        View Details
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+    </a>
                             </div>
                         </div>
                     @endforeach

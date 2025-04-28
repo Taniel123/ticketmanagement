@@ -101,14 +101,14 @@
 
         <nav class="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
             <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold px-3 mb-1 py-2">Main Menu</p>
-            <a href="{{ route('user.dashboard') }}" 
+            <a href="" 
    class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600
-          {{ Route::is('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600' : 'hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 hover:border-l-4 hover:border-indigo-600' }}">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 {{ Route::is('admin.dashboard') ? 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600' : 'hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 hover:border-l-4 hover:border-indigo-600' }}">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5z" />
     </svg>
-    My Tickets
+    View Ticket
 </a>
 
 
