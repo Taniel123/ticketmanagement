@@ -115,31 +115,8 @@ public function updateRole(Request $request, User $user)
     }
 }
 
-public function index()
-{
-    // Get daily tickets for last 7 days
-    $dailyTickets = Ticket::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-        ->whereDate('created_at', '>=', now()->subDays(7))
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
 
-    // Get weekly tickets for last 4 weeks
-    $weeklyTickets = Ticket::selectRaw('YEARWEEK(created_at) as week, COUNT(*) as count')
-        ->whereDate('created_at', '>=', now()->subWeeks(4))
-        ->groupBy('week')
-        ->orderBy('week')
-        ->get();
 
-    // Get monthly tickets for last 6 months
-    $monthlyTickets = Ticket::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-        ->whereDate('created_at', '>=', now()->subMonths(6))
-        ->groupBy('month')
-        ->orderBy('month')
-        ->get();
-
-    return view('dashboard.admin', compact('dailyTickets', 'weeklyTickets', 'monthlyTickets'));
-}
 
 }
 
