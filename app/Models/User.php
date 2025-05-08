@@ -2,31 +2,38 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, MustVerifyEmailTrait;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'is_approved',
+        'status',
+        'is_archived',
+        'email_verified_at',
     ];
 
+
+ 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -34,15 +41,43 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_approved' => 'boolean',
+    ];
+
+    /**
+     * Get the valid roles.
+     *
+     * @return array
+     */
+    public static function getRoles(): array
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return ['admin', 'support', 'user'];
+    }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string|array $roles): bool
+    {
+        if (is_string($roles)) {
+            return $this->role === $roles;
+        }
+
+        return in_array($this->role, $roles);
+    }
+
+    /**
+     * Get the tickets created by the user.
+     */
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }
